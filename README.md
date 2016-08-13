@@ -1,4 +1,4 @@
-# Ai-Tetris-Game
+# Ai Tetris Game
 
 This is the AI Tetris game source code and the training program attached to the game to train the AI robot players.
 AI Tetris game runs in several environments: Processing, as an applet, as a stand-alone application in Linux, Mac OS X and Windows and finally, using Processing.js, it does also run in Javascript.

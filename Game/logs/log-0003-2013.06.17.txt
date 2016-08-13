@@ -1,0 +1,402 @@
+START Training
+
+MAX_NUMBER_OF_GENERATIONS = 1000
+NUMBER_OF_PLAYERS = 10
+NUMBER_OF_GAME_MANAGERS_THREADS = 4
+WEIGHT_MIN = -5.0
+WEIGHT_MAX = 5.0
+Controller_PlayerRobotGenetic.EVALUATION_CURRENT_GRID_IMPORTANCE = 0.5
+Controller_PlayerRobotGenetic.EVALUATION_NEXT_TETROMINO_IMPORTANCE = 0.25
+Controller_PlayerRobotGenetic.EVALUATION_ALL_TETROMINOES_IMPORTANCE = 0.25
+Controller_PlayerRobotGenetic.ACCURACY_HOW_MANY_POSITIONS_TO_CHECK_IN_ADVANCE_PERCENTAGE = 0.0
+MAX_NUMBER_OF_PLAYERS_TO_SELECT_FOR_MUTATION = 1
+MAX_NUMBER_OF_PLAYERS_TO_SELECT_FOR_CROSSOVER_AND_MUTATION = 2
+MAX_NUMBER_OF_PLAYERS_TO_SELECT_FOR_CROSSOVER = 2
+MUTATION_PROBABILITY_TO_ALLOW_CHILD_TO_GO_TO_NEXT_GENERATION_EVEN_IF_WEAKER = 0.2
+CROSSOVER_PROBABILITY_TO_ALLOW_CHILD_TO_GO_TO_NEXT_GENERATION_EVEN_IF_WEAKER = 0.2
+CROSSOVER_MUTATION_PROBABILITY_TO_ALLOW_CHILD_TO_GO_TO_NEXT_GENERATION_EVEN_IF_WEAKER = 0.2
+TIME_TO_LOG_PROGRESS = 30000
+WEIGHT_MAX_TO_CHANGE_ON_MUTATION = 0.5
+MUTATION_TYPE_UNIFORM_PROBABILITY = 0.4
+CROSSOVER_TYPE_INTERMEDIATE_ALPHA = 0.3
+MUTATION_TYPE_DEFAULT = Uniform mutation
+CROSSOVER_TYPE_DEFAULT = Intermediate complete crossover
+
+######################################################
+Generation 1 START
+######################################################
+
+[2013.06.17 16:04:49 Generation #1]
+0 chromosomes replaced through mutation so far
+0 chromosomes replaced through crossover&mutation so far
+0 chromosomes replaced through crossover so far
+
+--Mutation phase--
+
+[2013.06.17 16:04:49 Generation #1 - Mutation chromosome 9]
+Mutation (0.0 0.0 0.0 0.0 0.0 0.0 ) in (0.0 0.0 -2.419964111230205 0.0 3.812744934993363 0.0 )
+
+
+[2013.06.17 16:05:12 Generation #1 - Mutation chromosome 9]
+Game over for all players!
+    0 - Chromosome 9 - 16 moves - score 0 - 9.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Mutant Chromosome 9 - 33 moves - score 0 - 10.0 (0.0 0.0 -2.419964111230205 0.0 3.812744934993363 0.0 )
+1 chromosomes replaced through mutation.
+
+--Crossover & Mutation phase--
+
+[2013.06.17 16:05:12 Generation #1 - Crossover&Mutation chromosome 1]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0  => 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0 
+
+[2013.06.17 16:05:12 Generation #1 - Crossover&Mutation chromosome 1]
+Mutation (0.0 0.0 0.0 0.0 0.0 0.0 ) in (0.0 0.39023302521152736 0.0 4.642230234681632 0.0 0.0 )
+
+[2013.06.17 16:05:12 Generation #1 - Crossover&Mutation chromosome 1]
+Mutation (0.0 0.0 0.0 0.0 0.0 0.0 ) in (0.0 0.0 0.0 0.0 3.655709378891924 0.0 )
+
+[2013.06.17 16:05:19 Generation #1 - Crossover&Mutation chromosome 1 - Move #13 - Mutant Chromosome Child 2]
+
+[2013.06.17 16:05:35 Generation #1 - Crossover&Mutation chromosome 1]
+Game over for all players!
+    0 - Mutant Chromosome Child 2 - 15 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 3.655709378891924 0.0 )
+    1 - Chromosome Parent 1  - 16 moves - score 0 - 0.03225806451612903 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Chromosome Parent 2  - 16 moves - score 0 - 0.03225806451612903 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    3 - Mutant Chromosome Child 1 - 46 moves - score 6 - 10.0 (0.0 0.39023302521152736 0.0 4.642230234681632 0.0 0.0 )
+
+[2013.06.17 16:05:35 Generation #1 - Crossover&Mutation chromosome 2]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0  => 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0 
+
+[2013.06.17 16:05:35 Generation #1 - Crossover&Mutation chromosome 2]
+Mutation (0.0 0.0 0.0 0.0 0.0 0.0 ) in (0.0 0.0 0.0 -1.1311663641065284 -1.8173388936915789 2.6347051295520867 )
+
+[2013.06.17 16:05:35 Generation #1 - Crossover&Mutation chromosome 2]
+Mutation (0.0 0.0 0.0 0.0 0.0 0.0 ) in (-4.2205230782294345 0.0 4.099251214557304 3.3530674305867354 0.0 -3.817364553665553 )
+
+[2013.06.17 16:05:49 Generation #1 - Crossover&Mutation chromosome 2 - Move #27 - Mutant Chromosome Child 2]
+
+[2013.06.17 16:06:02 Generation #1 - Crossover chromosome 3]
+Game over for all players!
+    0 - Chromosome Parent 2  - 12 moves - score 0 - 9.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Chromosome Parent 1  - 21 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Chromosome Child 1 - 21 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    3 - Chromosome Child 2 - 21 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+
+[2013.06.17 16:06:02 Generation #1 - Crossover chromosome 4]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0  => 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0 
+
+[2013.06.17 16:06:25 Generation #1 - Crossover chromosome 4 - Move #15 - Chromosome Child 2]
+
+[2013.06.17 16:06:28 Generation #1 - Crossover chromosome 4]
+Game over for all players!
+    0 - Chromosome Child 1 - 15 moves - score 0 - 9.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Chromosome Child 2 - 15 moves - score 0 - 9.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Chromosome Parent 1  - 20 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    3 - Chromosome Parent 2  - 20 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+1 chromosomes replaced through crossover.
+
+[2013.06.17 16:06:55 Generation #2 - Mutation chromosome 9 - Move #13 - Mutant Chromosome 9]
+[2013.06.17 16:07:25 Generation #2 - Mutation chromosome 9 - Move #73 - Mutant Chromosome 9]
+[2013.06.17 16:07:55 Generation #2 - Mutation chromosome 9 - Move #133 - Mutant Chromosome 9]
+
+[2013.06.17 16:08:00 Generation #2 - Mutation chromosome 9]
+Game over for all players!
+    0 - Chromosome 9 - 37 moves - score 4 - 0.0 (0.0 0.39023302521152736 0.0 4.642230234681632 0.0 0.0 )
+    1 - Mutant Chromosome 9 - 142 moves - score 44 - 10.0 (0.0 -3.313235994096597 0.0 4.642230234681632 1.5168725437827648 0.0 )
+1 chromosomes replaced through mutation.
+
+--Crossover & Mutation phase--
+
+[2013.06.17 16:08:00 Generation #2 - Crossover&Mutation chromosome 1]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0  => 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0 
+
+[2013.06.17 16:08:00 Generation #2 - Crossover&Mutation chromosome 1]
+Mutation (0.0 0.0 0.0 0.0 0.0 0.0 ) in (-1.3072572166729701 0.0 -0.33055864527570034 0.0 0.0 0.0 )
+
+[2013.06.17 16:08:00 Generation #2 - Crossover&Mutation chromosome 1]
+Mutation (0.0 0.0 0.0 0.0 0.0 0.0 ) in (0.0 -3.4607969390446467 4.744308171839032 2.1765418879691474 0.0 0.0 )
+
+[2013.06.17 16:08:25 Generation #2 - Crossover&Mutation chromosome 1 - Move #51 - Mutant Chromosome Child 2]
+
+[2013.06.17 16:08:27 Generation #2 - Crossover&Mutation chromosome 1]
+Game over for all players!
+    0 - Chromosome Parent 1  - 13 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Chromosome Parent 2  - 13 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Mutant Chromosome Child 2 - 20 moves - score 0 - 0.16666666666666666 (0.0 -3.4607969390446467 4.744308171839032 2.1765418879691474 0.0 0.0 )
+    3 - Mutant Chromosome Child 1 - 55 moves - score 9 - 10.0 (-1.3072572166729701 0.0 -0.33055864527570034 0.0 0.0 0.0 )
+
+[2013.06.17 16:08:27 Generation #2 - Crossover&Mutation chromosome 2]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0  => 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0 
+
+[2013.06.17 16:08:27 Generation #2 - Crossover&Mutation chromosome 2]
+Mutation (0.0 0.0 0.0 0.0 0.0 0.0 ) in (0.0 0.0 3.058867721659327 0.0 0.0 -4.690086661388766 )
+
+[2013.06.17 16:08:27 Generation #2 - Crossover&Mutation chromosome 2]
+Mutation (0.0 0.0 0.0 0.0 0.0 0.0 ) in (0.0 -1.1599870432081039 0.0 3.589006144838093 -4.964316330672562 4.028529932595303 )
+
+
+[2013.06.17 16:08:36 Generation #2 - Crossover&Mutation chromosome 2]
+Game over for all players!
+    0 - Mutant Chromosome Child 1 - 13 moves - score 0 - 9.0 (0.0 0.0 3.058867721659327 0.0 0.0 -4.690086661388766 )
+    1 - Chromosome Parent 2  - 16 moves - score 0 - 9.6 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Mutant Chromosome Child 2 - 16 moves - score 0 - 9.6 (0.0 -1.1599870432081039 0.0 3.589006144838093 -4.964316330672562 4.028529932595303 )
+    3 - Chromosome Parent 1  - 18 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+1 chromosomes replaced through crossover&mutation.
+
+--Crossover phase--
+
+[2013.06.17 16:08:36 Generation #2 - Crossover chromosome 3]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and -4.2205230782294345 0.0 4.099251214557304 3.3530674305867354 0.0 -3.817364553665553  => -2.954366154760604 0.0 2.8694758501901125 2.3471472014107144 0.0 -2.672155187565887  and -1.2661569234688304 0.0 1.2297753643671911 1.0059202291760205 0.0 -1.1452093660996658 
+
+
+[2013.06.17 16:08:51 Generation #2 - Crossover chromosome 3]
+Game over for all players!
+    0 - Chromosome Parent 1  - 13 moves - score 0 - 9.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Chromosome Parent 2  - 30 moves - score 0 - 10.0 (-4.2205230782294345 0.0 4.099251214557304 3.3530674305867354 0.0 -3.817364553665553 )
+    2 - Chromosome Child 1 - 30 moves - score 0 - 10.0 (-2.954366154760604 0.0 2.8694758501901125 2.3471472014107144 0.0 -2.672155187565887 )
+    3 - Chromosome Child 2 - 30 moves - score 0 - 10.0 (-1.2661569234688304 0.0 1.2297753643671911 1.0059202291760205 0.0 -1.1452093660996658 )
+
+[2013.06.17 16:08:51 Generation #2 - Crossover chromosome 4]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0  => 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0 
+
+[2013.06.17 16:08:55 Generation #2 - Crossover chromosome 4 - Move #8 - Chromosome Child 2]
+
+[2013.06.17 16:09:00 Generation #2 - Crossover chromosome 4]
+Game over for all players!
+    0 - Chromosome Parent 1  - 18 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Chromosome Parent 2  - 18 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Chromosome Child 1 - 18 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    3 - Chromosome Child 2 - 18 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+1 chromosomes replaced through crossover.
+
+[2013.06.17 16:09:25 Generation #2 - Move #43 - Robot Genetic 10]
+[2013.06.17 16:09:55 Generation #2 - Move #103 - Robot Genetic 10]
+[2013.06.17 16:10:25 Generation #2 - Move #163 - Robot Genetic 10]
+[2013.06.17 16:10:55 Generation #2 - Move #223 - Robot Genetic 10]
+[2013.06.17 16:11:25 Generation #2 - Move #283 - Robot Genetic 10]
+[2013.06.17 16:11:55 Generation #2 - Move #343 - Robot Genetic 10]
+[2013.06.17 16:12:25 Generation #2 - Move #403 - Robot Genetic 10]
+[2013.06.17 16:12:57 Generation #2 - Move #420 - Robot Genetic 10]
+[2013.06.17 16:13:31 Generation #2 - Move #420 - Robot Genetic 10]
+[2013.06.17 16:14:07 Generation #2 - Move #423 - Robot Genetic 10]
+[2013.06.17 16:14:44 Generation #2 - Move #423 - Robot Genetic 10]
+[2013.06.17 16:16:44 Generation #2 - Move #423 - Robot Genetic 10]
+[2013.06.17 16:17:15 Generation #2 - Move #423 - Robot Genetic 10]
+[2013.06.17 16:19:02 Generation #2 - Move #424 - Robot Genetic 10]
+[2013.06.17 16:19:54 Generation #2 - Move #424 - Robot Genetic 10]
+[2013.06.17 16:21:25 Generation #2 - Move #424 - Robot Genetic 10]
+[2013.06.17 16:21:57 Generation #2 - Move #425 - Robot Genetic 10]
+[2013.06.17 16:22:31 Generation #2 - Move #425 - Robot Genetic 10]
+[2013.06.17 16:23:01 Generation #2 - Move #425 - Robot Genetic 10]
+[2013.06.17 16:23:44 Generation #2 - Move #425 - Robot Genetic 10]
+[2013.06.17 16:24:35 Generation #2 - Move #425 - Robot Genetic 10]
+[2013.06.17 16:25:10 Generation #2 - Move #426 - Robot Genetic]
+[2013.06.17 16:26:12 Generation #2 - Move #426 - Robot Genetic 10]
+[2013.06.17 16:27:43 Generation #2 - Move #426 - Robot Genetic 10]
+[2013.06.17 16:30:00 Generation #2 - Move #426 - Robot Genetic 10]
+[2013.06.17 16:31:06 Generation #2 - Move #426 - Robot Genetic 10]
+[2013.06.17 16:31:37 Generation #2 - Move #463 - Robot Genetic 10]
+[2013.06.17 16:32:07 Generation #2 - Move #523 - Robot Genetic 10]
+[2013.06.17 16:32:37 Generation #2 - Move #583 - Robot Genetic 10]
+[2013.06.17 16:33:58 Generation #2 - Move #596 - Robot Genetic 10]
+[2013.06.17 16:34:28 Generation #2 - Move #648 - Robot Genetic 10]
+[2013.06.17 16:34:58 Generation #2 - Move #708 - Robot Genetic 10]
+[2013.06.17 16:35:28 Generation #2 - Move #768 - Robot Genetic 10]
+[2013.06.17 16:35:58 Generation #2 - Move #828 - Robot Genetic 10]
+[2013.06.17 16:36:28 Generation #2 - Move #888 - Robot Genetic 10]
+[2013.06.17 16:38:00 Generation #2 - Move #948 - Robot Genetic 10]
+[2013.06.17 16:38:30 Generation #2 - Move #993 - Robot Genetic 10]
+[2013.06.17 16:39:00 Generation #2 - Move #1053 - Robot Genetic 10]
+[2013.06.17 16:39:30 Generation #2 - Move #1113 - Robot Genetic 10]
+[2013.06.17 16:40:00 Generation #2 - Move #1173 - Robot Genetic 10]
+[2013.06.17 16:40:30 Generation #2 - Move #1233 - Robot Genetic 10]
+[2013.06.17 16:41:00 Generation #2 - Move #1293 - Robot Genetic 10]
+[2013.06.17 16:41:30 Generation #2 - Move #1353 - Robot Genetic 10]
+[2013.06.17 16:42:00 Generation #2 - Move #1413 - Robot Genetic 10]
+[2013.06.17 16:42:30 Generation #2 - Move #1473 - Robot Genetic 10]
+[2013.06.17 16:43:00 Generation #2 - Move #1533 - Robot Genetic 10]
+[2013.06.17 16:43:30 Generation #2 - Move #1593 - Robot Genetic 10]
+[2013.06.17 16:44:00 Generation #2 - Move #1653 - Robot Genetic 10]
+[2013.06.17 16:44:30 Generation #2 - Move #1713 - Robot Genetic 10]
+[2013.06.17 16:45:00 Generation #2 - Move #1773 - Robot Genetic 10]
+[2013.06.17 16:45:30 Generation #2 - Move #1833 - Robot Genetic 10]
+[2013.06.17 16:46:00 Generation #2 - Move #1893 - Robot Genetic 10]
+[2013.06.17 16:46:30 Generation #2 - Move #1953 - Robot Genetic 10]
+[2013.06.17 16:47:00 Generation #2 - Move #2013 - Robot Genetic 10]
+[2013.06.17 16:47:30 Generation #2 - Move #2073 - Robot Genetic 10]
+[2013.06.17 16:48:00 Generation #2 - Move #2133 - Robot Genetic 10]
+[2013.06.17 16:48:30 Generation #2 - Move #2193 - Robot Genetic 10]
+[2013.06.17 16:49:00 Generation #2 - Move #2252 - Robot Genetic 10]
+[2013.06.17 16:49:30 Generation #2 - Move #2312 - Robot Genetic 10]
+[2013.06.17 16:50:00 Generation #2 - Move #2372 - Robot Genetic 10]
+[2013.06.17 16:50:30 Generation #2 - Move #2432 - Robot Genetic 10]
+[2013.06.17 16:51:00 Generation #2 - Move #2492 - Robot Genetic 10]
+[2013.06.17 16:51:30 Generation #2 - Move #2552 - Robot Genetic 10]
+[2013.06.17 16:52:00 Generation #2 - Move #2612 - Robot Genetic 10]
+[2013.06.17 16:52:30 Generation #2 - Move #2672 - Robot Genetic 10]
+[2013.06.17 16:53:00 Generation #2 - Move #2732 - Robot Genetic 10]
+[2013.06.17 16:53:30 Generation #2 - Move #2792 - Robot Genetic 10]
+[2013.06.17 16:54:00 Generation #2 - Move #2852 - Robot Genetic 10]
+[2013.06.17 16:54:30 Generation #2 - Move #2912 - Robot Genetic 10]
+[2013.06.17 16:55:00 Generation #2 - Move #2972 - Robot Genetic 10]
+[2013.06.17 16:55:30 Generation #2 - Move #3032 - Robot Genetic 10]
+[2013.06.17 16:56:00 Generation #2 - Move #3092 - Robot Genetic 10]
+[2013.06.17 16:56:30 Generation #2 - Move #3152 - Robot Genetic 10]
+[2013.06.17 16:57:00 Generation #2 - Move #3212 - Robot Genetic 10]
+[2013.06.17 16:57:30 Generation #2 - Move #3272 - Robot Genetic 10]
+[2013.06.17 16:58:00 Generation #2 - Move #3332 - Robot Genetic 10]
+[2013.06.17 16:58:30 Generation #2 - Move #3392 - Robot Genetic 10]
+[2013.06.17 16:59:00 Generation #2 - Move #3452 - Robot Genetic 10]
+[2013.06.17 16:59:30 Generation #2 - Move #3512 - Robot Genetic 10]
+[2013.06.17 17:00:00 Generation #2 - Move #3571 - Robot Genetic 10]
+[2013.06.17 17:00:30 Generation #2 - Move #3631 - Robot Genetic 10]
+[2013.06.17 17:01:00 Generation #2 - Move #3691 - Robot Genetic 10]
+[2013.06.17 17:01:30 Generation #2 - Move #3751 - Robot Genetic 10]
+[2013.06.17 17:02:00 Generation #2 - Move #3811 - Robot Genetic 10]
+[2013.06.17 17:02:30 Generation #2 - Move #3871 - Robot Genetic 10]
+[2013.06.17 17:03:00 Generation #2 - Move #3931 - Robot Genetic 10]
+[2013.06.17 17:03:30 Generation #2 - Move #3991 - Robot Genetic 10]
+[2013.06.17 17:04:00 Generation #2 - Move #4051 - Robot Genetic 10]
+[2013.06.17 17:04:30 Generation #2 - Move #4111 - Robot Genetic 10]
+[2013.06.17 17:05:00 Generation #2 - Move #4171 - Robot Genetic 10]
+[2013.06.17 17:05:30 Generation #2 - Move #4231 - Robot Genetic 10]
+[2013.06.17 17:06:00 Generation #2 - Move #4291 - Robot Genetic 10]
+[2013.06.17 17:06:30 Generation #2 - Move #4351 - Robot Genetic 10]
+[2013.06.17 17:07:00 Generation #2 - Move #4411 - Robot Genetic 10]
+[2013.06.17 17:07:30 Generation #2 - Move #4471 - Robot Genetic 10]
+[2013.06.17 17:08:00 Generation #2 - Move #4531 - Robot Genetic 10]
+[2013.06.17 17:08:30 Generation #2 - Move #4591 - Robot Genetic 10]
+[2013.06.17 17:09:00 Generation #2 - Move #4651 - Robot Genetic 10]
+[2013.06.17 17:09:30 Generation #2 - Move #4711 - Robot Genetic 10]
+[2013.06.17 17:10:00 Generation #2 - Move #4771 - Robot Genetic 10]
+[2013.06.17 17:10:30 Generation #2 - Move #4831 - Robot Genetic 10]
+[2013.06.17 17:11:00 Generation #2 - Move #4891 - Robot Genetic 10]
+[2013.06.17 17:11:30 Generation #2 - Move #4951 - Robot Genetic 10]
+[2013.06.17 17:12:00 Generation #2 - Move #5011 - Robot Genetic 10]
+[2013.06.17 17:12:30 Generation #2 - Move #5071 - Robot Genetic 10]
+[2013.06.17 17:13:00 Generation #2 - Move #5131 - Robot Genetic 10]
+[2013.06.17 17:13:30 Generation #2 - Move #5191 - Robot Genetic 10]
+[2013.06.17 17:14:00 Generation #2 - Move #5251 - Robot Genetic 10]
+[2013.06.17 17:14:30 Generation #2 - Move #5311 - Robot Genetic 10]
+
+[2013.06.17 17:14:46 Generation #2]
+Game over for all players!
+    0 - Robot Genetic 3 - 19 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Robot Genetic 5 - 19 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Robot Genetic 6 - 19 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    3 - Robot Genetic 7 - 19 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    4 - Robot Genetic 4 - 23 moves - score 0 - 7.51597143930853E-4 (-1.2661569234688304 0.0 1.2297753643671911 1.0059202291760205 0.0 -1.1452093660996658 )
+    5 - Robot Genetic 9 - 23 moves - score 0 - 7.51597143930853E-4 (-4.2205230782294345 0.0 4.099251214557304 3.3530674305867354 0.0 -3.817364553665553 )
+    6 - Robot Genetic 10 - 33 moves - score 0 - 0.0026305900037579856 (0.0 0.39023302521152736 0.0 4.642230234681632 0.0 0.0 )
+    7 - Robot Genetic 8 - 37 moves - score 0 - 0.0033821871476888386 (0.0 0.0 -2.419964111230205 0.0 3.812744934993363 0.0 )
+    8 - Robot Genetic 2 - 65 moves - score 11 - 0.05525353664673023 (-1.3072572166729701 0.0 -0.33055864527570034 0.0 0.0 0.0 )
+    9 - Robot Genetic - 5341 moves - score 2124 - 10.0 (0.0 -3.313235994096597 0.0 4.642230234681632 1.5168725437827648 0.0 )
+
+######################################################
+Generation 2 STOP
+######################################################
+
+######################################################
+Generation 3 START
+######################################################
+
+[2013.06.17 17:14:46 Generation #3]
+2 chromosomes replaced through mutation so far
+3 chromosomes replaced through crossover&mutation so far
+2 chromosomes replaced through crossover so far
+
+--Mutation phase--
+
+[2013.06.17 17:14:46 Generation #3 - Mutation chromosome 9]
+Mutation (0.0 -3.313235994096597 0.0 4.642230234681632 1.5168725437827648 0.0 ) in (0.0 -3.313235994096597 0.0 -2.983271104904582 1.5168725437827648 0.0 )
+
+[2013.06.17 17:15:00 Generation #3 - Mutation chromosome 9 - Move #30 - Mutant Chromosome 9]
+[2013.06.17 17:15:30 Generation #3 - Mutation chromosome 9 - Move #90 - Mutant Chromosome 9]
+[2013.06.17 17:16:00 Generation #3 - Mutation chromosome 9 - Move #150 - Mutant Chromosome 9]
+[2013.06.17 17:16:30 Generation #3 - Mutation chromosome 9 - Move #210 - Mutant Chromosome 9]
+[2013.06.17 17:17:00 Generation #3 - Mutation chromosome 9 - Move #270 - Mutant Chromosome 9]
+[2013.06.17 17:17:30 Generation #3 - Mutation chromosome 9 - Move #330 - Mutant Chromosome 9]
+[2013.06.17 17:18:00 Generation #3 - Mutation chromosome 9 - Move #390 - Mutant Chromosome 9]
+[2013.06.17 17:18:30 Generation #3 - Mutation chromosome 9 - Move #450 - Mutant Chromosome 9]
+[2013.06.17 17:19:00 Generation #3 - Mutation chromosome 9 - Move #510 - Mutant Chromosome 9]
+[2013.06.17 17:19:30 Generation #3 - Mutation chromosome 9 - Move #570 - Mutant Chromosome 9]
+[2013.06.17 17:20:00 Generation #3 - Mutation chromosome 9 - Move #630 - Mutant Chromosome 9]
+[2013.06.17 17:20:30 Generation #3 - Mutation chromosome 9 - Move #690 - Mutant Chromosome 9]
+[2013.06.17 17:21:00 Generation #3 - Mutation chromosome 9 - Move #749 - Mutant Chromosome 9]
+[2013.06.17 17:21:30 Generation #3 - Mutation chromosome 9 - Move #809 - Mutant Chromosome 9]
+[2013.06.17 17:22:00 Generation #3 - Mutation chromosome 9 - Move #869 - Mutant Chromosome 9]
+[2013.06.17 17:22:30 Generation #3 - Mutation chromosome 9 - Move #929 - Mutant Chromosome 9]
+[2013.06.17 17:23:00 Generation #3 - Mutation chromosome 9 - Move #988 - Mutant Chromosome 9]
+[2013.06.17 17:23:30 Generation #3 - Mutation chromosome 9 - Move #1048 - Mutant Chromosome 9]
+[2013.06.17 17:24:00 Generation #3 - Mutation chromosome 9 - Move #1108 - Mutant Chromosome 9]
+[2013.06.17 17:24:30 Generation #3 - Mutation chromosome 9 - Move #1168 - Mutant Chromosome 9]
+[2013.06.17 17:25:00 Generation #3 - Mutation chromosome 9 - Move #1228 - Mutant Chromosome 9]
+[2013.06.17 17:25:30 Generation #3 - Mutation chromosome 9 - Move #1286 - Mutant Chromosome 9]
+[2013.06.17 17:26:00 Generation #3 - Mutation chromosome 9 - Move #1345 - Mutant Chromosome 9]
+[2013.06.17 17:26:31 Generation #3 - Mutation chromosome 9 - Move #1405 - Mutant Chromosome 9]
+[2013.06.17 17:27:01 Generation #3 - Mutation chromosome 9 - Move #1465 - Mutant Chromosome 9]
+[2013.06.17 17:27:31 Generation #3 - Mutation chromosome 9 - Move #1525 - Mutant Chromosome 9]
+[2013.06.17 17:28:01 Generation #3 - Mutation chromosome 9 - Move #1585 - Mutant Chromosome 9]
+[2013.06.17 17:28:31 Generation #3 - Mutation chromosome 9 - Move #1645 - Mutant Chromosome 9]
+[2013.06.17 17:29:01 Generation #3 - Mutation chromosome 9 - Move #1705 - Mutant Chromosome 9]
+[2013.06.17 17:29:31 Generation #3 - Mutation chromosome 9 - Move #1765 - Mutant Chromosome 9]
+[2013.06.17 17:30:01 Generation #3 - Mutation chromosome 9 - Move #1825 - Mutant Chromosome 9]
+[2013.06.17 17:30:31 Generation #3 - Mutation chromosome 9 - Move #1885 - Mutant Chromosome 9]
+[2013.06.17 17:31:01 Generation #3 - Mutation chromosome 9 - Move #1945 - Mutant Chromosome 9]
+[2013.06.17 17:31:31 Generation #3 - Mutation chromosome 9 - Move #2005 - Mutant Chromosome 9]
+[2013.06.17 17:32:01 Generation #3 - Mutation chromosome 9 - Move #2065 - Mutant Chromosome 9]
+[2013.06.17 17:32:31 Generation #3 - Mutation chromosome 9 - Move #2125 - Mutant Chromosome 9]
+[2013.06.17 17:33:01 Generation #3 - Mutation chromosome 9 - Move #2185 - Mutant Chromosome 9]
+[2013.06.17 17:33:31 Generation #3 - Mutation chromosome 9 - Move #2245 - Mutant Chromosome 9]
+[2013.06.17 17:34:01 Generation #3 - Mutation chromosome 9 - Move #2305 - Mutant Chromosome 9]
+[2013.06.17 17:34:31 Generation #3 - Mutation chromosome 9 - Move #2365 - Mutant Chromosome 9]
+[2013.06.17 17:35:01 Generation #3 - Mutation chromosome 9 - Move #2425 - Mutant Chromosome 9]
+[2013.06.17 17:35:31 Generation #3 - Mutation chromosome 9 - Move #2485 - Mutant Chromosome 9]
+[2013.06.17 17:36:01 Generation #3 - Mutation chromosome 9 - Move #2545 - Mutant Chromosome 9]
+[2013.06.17 17:36:31 Generation #3 - Mutation chromosome 9 - Move #2605 - Mutant Chromosome 9]
+[2013.06.17 17:37:01 Generation #3 - Mutation chromosome 9 - Move #2664 - Mutant Chromosome 9]
+[2013.06.17 17:37:31 Generation #3 - Mutation chromosome 9 - Move #2724 - Mutant Chromosome 9]
+[2013.06.17 17:38:01 Generation #3 - Mutation chromosome 9 - Move #2784 - Mutant Chromosome 9]
+[2013.06.17 17:38:31 Generation #3 - Mutation chromosome 9 - Move #2843 - Mutant Chromosome 9]
+[2013.06.17 17:39:01 Generation #3 - Mutation chromosome 9 - Move #2903 - Mutant Chromosome 9]
+[2013.06.17 17:39:31 Generation #3 - Mutation chromosome 9 - Move #2962 - Mutant Chromosome 9]
+[2013.06.17 17:40:01 Generation #3 - Mutation chromosome 9 - Move #3022 - Mutant Chromosome 9]
+[2013.06.17 17:40:31 Generation #3 - Mutation chromosome 9 - Move #3082 - Mutant Chromosome 9]
+[2013.06.17 17:41:01 Generation #3 - Mutation chromosome 9 - Move #3142 - Mutant Chromosome 9]
+[2013.06.17 17:41:31 Generation #3 - Mutation chromosome 9 - Move #3201 - Mutant Chromosome 9]
+[2013.06.17 17:42:01 Generation #3 - Mutation chromosome 9 - Move #3261 - Mutant Chromosome 9]
+[2013.06.17 17:42:31 Generation #3 - Mutation chromosome 9 - Move #3321 - Mutant Chromosome 9]
+[2013.06.17 17:43:01 Generation #3 - Mutation chromosome 9 - Move #3380 - Mutant Chromosome 9]
+[2013.06.17 17:43:31 Generation #3 - Mutation chromosome 9 - Move #3440 - Mutant Chromosome 9]
+[2013.06.17 17:44:01 Generation #3 - Mutation chromosome 9 - Move #3500 - Mutant Chromosome 9]
+[2013.06.17 17:44:31 Generation #3 - Mutation chromosome 9 - Move #3560 - Mutant Chromosome 9]
+[2013.06.17 17:45:01 Generation #3 - Mutation chromosome 9 - Move #3619 - Mutant Chromosome 9]
+[2013.06.17 17:45:31 Generation #3 - Mutation chromosome 9 - Move #3679 - Mutant Chromosome 9]
+[2013.06.17 17:46:01 Generation #3 - Mutation chromosome 9 - Move #3739 - Mutant Chromosome 9]
+[2013.06.17 17:46:31 Generation #3 - Mutation chromosome 9 - Move #3798 - Mutant Chromosome 9]
+[2013.06.17 17:47:01 Generation #3 - Mutation chromosome 9 - Move #3857 - Mutant Chromosome 9]
+[2013.06.17 17:47:31 Generation #3 - Mutation chromosome 9 - Move #3917 - Mutant Chromosome 9]
+[2013.06.17 17:48:01 Generation #3 - Mutation chromosome 9 - Move #3977 - Mutant Chromosome 9]
+[2013.06.17 17:48:31 Generation #3 - Mutation chromosome 9 - Move #4034 - Mutant Chromosome 9]
+[2013.06.17 17:49:01 Generation #3 - Mutation chromosome 9 - Move #4093 - Mutant Chromosome 9]
+[2013.06.17 17:49:31 Generation #3 - Mutation chromosome 9 - Move #4152 - Mutant Chromosome 9]
+[2013.06.17 17:50:01 Generation #3 - Mutation chromosome 9 - Move #4212 - Mutant Chromosome 9]
+[2013.06.17 17:50:31 Generation #3 - Mutation chromosome 9 - Move #4272 - Mutant Chromosome 9]
+[2013.06.17 17:51:01 Generation #3 - Mutation chromosome 9 - Move #4332 - Mutant Chromosome 9]
+[2013.06.17 17:51:31 Generation #3 - Mutation chromosome 9 - Move #4391 - Mutant Chromosome 9]
+[2013.06.17 17:52:01 Generation #3 - Mutation chromosome 9 - Move #4451 - Mutant Chromosome 9]
+[2013.06.17 17:52:31 Generation #3 - Mutation chromosome 9 - Move #4511 - Mutant Chromosome 9]
+[2013.06.17 17:53:01 Generation #3 - Mutation chromosome 9 - Move #4569 - Mutant Chromosome 9]
+[2013.06.17 17:53:31 Generation #3 - Mutation chromosome 9 - Move #4629 - Mutant Chromosome 9]
+[2013.06.17 17:54:01 Generation #3 - Mutation chromosome 9 - Move #4689 - Mutant Chromosome 9]
+[2013.06.17 17:54:31 Generation #3 - Mutation chromosome 9 - Move #4748 - Mutant Chromosome 9]
+[2013.06.17 17:55:01 Generation #3 - Mutation chromosome 9 - Move #4808 - Mutant Chromosome 9]
+[2013.06.17 17:55:31 Generation #3 - Mutation chromosome 9 - Move #4868 - Mutant Chromosome 9]
+[2013.06.17 17:56:01 Generation #3 - Mutation chromosome 9 - Move #4927 - Mutant Chromosome 9]
+[2013.06.17 17:56:31 Generation #3 - Mutation chromosome 9 - Move #4987 - Mutant Chromosome 9]
+[2013.06.17 17:57:01 Generation #3 - Mutation chromosome 9 - Move #5047 - Mutant Chromosome 9]
+[2013.06.17 17:57:31 Generation #3 - Mutation chromosome 9 - Move #5107 - Mutant Chromosome 9]
+[2013.06.17 17:58:01 Generation #3 - Mutation chromosome 9 - Move #5166 - Mutant Chromosome 9]
+[2013.06.17 17:58:33 Generation #3 - Mutation chromosome 9 - Move #5189 - Mutant Chromosome 9]
+[2013.06.17 18:00:09 Generation #3 - Mutation chromosome 9 - Move #5239 - Mutant Chromosome 9]
+
+FORCED TO STOP, as there was a very good player, while the rest were very weak, so there should be no reason why to keep that player play for too long, as it already "won" that generation.

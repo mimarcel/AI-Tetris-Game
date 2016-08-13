@@ -1,0 +1,5358 @@
+
+
+public abstract class Controller_Player_Grid extends Controller_Abstract
+{
+    public long TIME_TETROMINO_FALLS_DOWN_ONE_LEVEL = 500;
+    public long CHECK_TETROMINO_SHOULD_BE_CHANGED = 500;
+    protected boolean disabledFalling = false;
+
+    /**
+     * Create controller.
+     */
+    public Controller_Player_Grid(Controller_PlayerAbstract controller_player) {
+        super(controller_player, null, null);
+
+        switch (controller_player.getModel().getType()) {
+            case Model_Player.PLAYER_TYPE_HUMAN:
+                this.view = new View_PlayerHuman_Grid(
+                        (Controller_PlayerHuman_Grid) this,
+                        (View_PlayerHuman) this.getParentController().getView()
+                );
+                break;
+            case Model_Player.PLAYER_TYPE_ROBOT_RANDOM:
+                this.view = new View_PlayerRobotRandom_Grid(
+                        (Controller_PlayerRobotRandom_Grid) this,
+                        (View_PlayerRobotRandom) this.getParentController().getView()
+                );
+                break;
+            case Model_Player.PLAYER_TYPE_ROBOT_GENETIC:
+                this.view = new View_PlayerRobotGenetic_Grid(
+                        (Controller_PlayerRobotGenetic_Grid) this,
+                        (View_PlayerRobotGenetic) this.getParentController().getView()
+                );
+                break;
+        }
+
+        this.model = controller_player.getModel();
+    }
+
+    public View_Player_Grid getView() {
+        return (View_Player_Grid) super.getView();
+    }
+
+    public Model_PlayerAbstract getModel() {
+        return (Model_PlayerAbstract) this.getParentController().getModel();
+    }
+
+    public Controller_PlayerAbstract getParentController() {
+        return (Controller_PlayerAbstract) super.getParentController();
+    }
+
+    /**
+     * Get where tetromino should be placed on X.
+     */
+    public float getTetrominoPositionX() {
+        return this.getView().GRID_START_X
+                + this.getParentController().getView().SIZE_MATRIX_ELEMENT_X
+                * this.getModel().getCurrentTetrominoPositionColumn();
+    }
+
+    /**
+     * Get where tetromino should be placed on Y.
+     */
+    public float getTetrominoPositionY() {
+        return this.getView().GRID_START_Y
+                + this.getParentController().getView().SIZE_MATRIX_ELEMENT_Y
+                * this.getModel().getCurrentTetrominoPositionLine();
+    }
+
+    /**
+     * Set current tetromino.
+     */
+    public void setCurrentTetromino(Model_Tetromino currentTetromino) {
+        this.setCurrentTetrominoPositionLine(0);
+        this.setCurrentTetrominoPositionColumn(
+                        int(Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID / 2)
+        );
+        this.getModel().setTetrominoLastFallingTime(millis());
+        this.getModel().setCurrentTetromino(currentTetromino);
+    }
+
+    /**
+     * Set the column position of the current tetromino. Update grid.
+     */
+    public void setCurrentTetrominoPositionColumn(int column) {
+        this.getModel().setCurrentTetrominoPositionColumn(column);
+    }
+
+    /**
+     * Set the line position of the current tetromino. Update grid.
+     */
+    public void setCurrentTetrominoPositionLine(int line) {
+        this.getModel().setCurrentTetrominoPositionLine(line);
+    }
+
+    /**
+     * Remove current tetromino from grid.
+     */
+    public void removeCurrentTetrominoFromGrid() {
+        int line = this.getModel().getCurrentTetrominoPositionLine();
+        int column = this.getModel().getCurrentTetrominoPositionColumn();
+        this.removeTetrominoFromGrid(this.getCurrentTetromino(), line, column);
+    }
+
+    /**
+     * Remove tetromino from grid.
+     */
+    protected void removeTetrominoFromGrid(Model_Tetromino tetromino, int line, int column) {
+        if (tetromino == null) {
+            return;
+        }
+        this.removeMatrixFromGrid(tetromino.getCurrentRotation(), line, column);
+    }
+
+    /**
+     * Remove matrix from grid.
+     */
+    protected void removeMatrixFromGrid(short[][] pos, int line, int column) {
+        short[][] grid = this.getModel().getGrid();
+        for (int i = 0; i < pos.length; i++) {
+            for (int j = 0; j < pos[i].length; j++) {
+                if (pos[i][j] != 0
+                        ) {
+                    grid[line + i][column + j] = Model_Color.NONE;
+                }
+            }
+        }
+        this.getModel().setGrid(grid);
+    }
+
+    /**
+     * Add current tetromino from grid.
+     */
+    public void addCurrentTetrominoToCurentGrid() {
+        int line = this.getModel().getCurrentTetrominoPositionLine();
+        int column = this.getModel().getCurrentTetrominoPositionColumn();
+        this.addTetrominoToGrid(this.getCurrentTetromino(), line, column, this.getModel().getGrid());
+    }
+
+    /**
+     * Add tetromino to grid.
+     */
+    public void addTetrominoToGrid(Model_Tetromino tetromino, int line, int column, short[][] grid) {
+        if (tetromino == null) {
+            return;
+        }
+        this.addMatrixToGrid(tetromino.getCurrentRotation(), tetromino.getColor(), line, column, grid);
+    }
+
+    /**
+     * Add matrix to grid using color given.
+     */
+    public void addMatrixToGrid(short[][] pos, short color, int line, int column, short[][] grid) {
+        for (int i = 0; i < pos.length; i++) {
+            for (int j = 0; j < pos[i].length; j++) {
+                if (pos[i][j] != 0
+                        ) {
+                    grid[line + i][column + j] = color;
+                }
+            }
+        }
+    }
+
+    /**
+     * Get current tetromino.
+     */
+    public Model_Tetromino getCurrentTetromino() {
+        return this.getModel().getCurrentTetromino();
+    }
+
+    /**
+     * Return true if current tetromino can be placed on give position in the grid.
+     */
+    public boolean tetrominoCanBePlacedOnPosition(Model_Tetromino tetromino, int line, int column, short[][] grid) {
+        short[][] position = tetromino.getCurrentRotation();
+        for (int i = 0; i < position.length; i++) {
+            for (int j = 0; j < position[i].length; j++) {
+                // Out of grid?
+                if (position[i][j] != 0 &&
+                        (line + i < 0 || line + i >= grid.length
+                                || column + j < 0 || column + j >= grid[line + i].length)
+                        ) {
+                    return false;
+                }
+                // Is over grid element?
+                if (position[i][j] != 0 && grid[line + i][column + j] != 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Disable falling. (for robots)
+     */
+    public void disableFalling() {
+        this.disabledFalling = true;
+    }
+
+    /**
+     * Enable falling.
+     */
+    public void enableFalling() {
+        this.disabledFalling = false;
+    }
+
+    /**
+     * Check current tetromino.
+     */
+    public boolean checkCurrentTetromino()  {
+        long time = millis();
+        if (!this.disabledFalling &&
+                time - this.getModel().getTetrominoLastFallingTime() >= TIME_TETROMINO_FALLS_DOWN_ONE_LEVEL) {
+            this.getModel().setTetrominoLastFallingTime(time);
+            // Down one level.
+            if (this.tetrominoCanBePlacedOnPosition(
+                    this.getCurrentTetromino(),
+                    this.getModel().getCurrentTetrominoPositionLine() + 1,
+                    this.getModel().getCurrentTetrominoPositionColumn(),
+                    this.getModel().getGrid())
+                    ) {
+                this.setCurrentTetrominoPositionLine(this.getModel().getCurrentTetrominoPositionLine() + 1);
+                return true;
+            }
+        }
+        if (time - this.getModel().getTimeLastCheckForTetrominoShouldBeChanged() >= CHECK_TETROMINO_SHOULD_BE_CHANGED) {
+            this.getModel().setTimeLastCheckForTetrominoShouldBeChanged(time);
+            if (!this.tetrominoCanBePlacedOnPosition(
+                    this.getCurrentTetromino(),
+                    this.getModel().getCurrentTetrominoPositionLine() + 1,
+                    this.getModel().getCurrentTetrominoPositionColumn(),
+                    this.getModel().getGrid())
+                    ) {
+                this.newTetrominoOnGrid();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Change current tetromino to be next tetromino and generate a new next tetromino.
+     */
+    public synchronized void newTetrominoOnGrid()  {
+        // Next tetromino
+        this.addCurrentTetrominoToCurentGrid();
+        this.setCurrentTetromino(this.getParentController().getNextTetromino());
+
+        // Game over?
+        if (!this.tetrominoCanBePlacedOnPosition(
+                this.getCurrentTetromino(),
+                this.getModel().getCurrentTetrominoPositionLine(),
+                this.getModel().getCurrentTetrominoPositionColumn(),
+                this.getModel().getGrid())
+                ) {
+            this.getParentController().playerGameOver();
+        }
+
+        this.getParentController().setNextTetrominoForPlayer();
+    }
+
+    /**
+     * Move right.
+     */
+    public void moveCurrentTetrominoToRight() {
+        if (this.tetrominoCanBePlacedOnPosition(
+                this.getCurrentTetromino(),
+                this.getModel().getCurrentTetrominoPositionLine(),
+                this.getModel().getCurrentTetrominoPositionColumn() + 1,
+                this.getModel().getGrid())
+                ) {
+            this.setCurrentTetrominoPositionColumn(this.getModel().getCurrentTetrominoPositionColumn() + 1);
+        }
+    }
+
+    /**
+     * Move left.
+     */
+    public void moveCurrentTetrominoToLeft() {
+        if (this.tetrominoCanBePlacedOnPosition(
+                this.getCurrentTetromino(),
+                this.getModel().getCurrentTetrominoPositionLine(),
+                this.getModel().getCurrentTetrominoPositionColumn() - 1,
+                this.getModel().getGrid())
+                ) {
+            this.setCurrentTetrominoPositionColumn(this.getModel().getCurrentTetrominoPositionColumn() - 1);
+        }
+    }
+
+    /**
+     * Move down.
+     */
+    public void moveCurrentTetrominoDownOneLevel() {
+        if (this.tetrominoCanBePlacedOnPosition(
+                this.getCurrentTetromino(),
+                this.getModel().getCurrentTetrominoPositionLine() + 1,
+                this.getModel().getCurrentTetrominoPositionColumn(),
+                this.getModel().getGrid())
+                ) {
+            this.setCurrentTetrominoPositionLine(this.getModel().getCurrentTetrominoPositionLine() + 1);
+        }
+    }
+
+    /**
+     * Fall current tetromino.
+     */
+    public void fallCurrentTetromino() {
+        while (this.tetrominoCanBePlacedOnPosition(
+                this.getCurrentTetromino(),
+                this.getModel().getCurrentTetrominoPositionLine() + 1,
+                this.getModel().getCurrentTetrominoPositionColumn(),
+                this.getModel().getGrid())) {
+            this.setCurrentTetrominoPositionLine(this.getModel().getCurrentTetrominoPositionLine() + 1);
+        }
+    }
+
+    /**
+     * Rotate tetromino to right if possible.
+     */
+    public void rotateTetrominoToRight() {
+        this.getModel().getCurrentTetromino().rotateToRight();
+        int i;
+        for (i = 0; i < 4; i++) {
+            if (this.tetrominoCanBePlacedOnPosition(
+                    this.getCurrentTetromino(),
+                    this.getModel().getCurrentTetrominoPositionLine(),
+                    this.getModel().getCurrentTetrominoPositionColumn() - i,
+                    this.getModel().getGrid())) {
+                break;
+            }
+        }
+        if (i == 4) {
+            this.getModel().getCurrentTetromino().rotateToLeft();
+        } else {
+            this.getModel().setCurrentTetrominoPositionColumn(
+                    this.getModel().getCurrentTetrominoPositionColumn() - i
+            );
+        }
+    }
+
+    /**
+     * Rotate tetromino to left if possible.
+     */
+    public void rotateTetrominoToLeft() {
+        this.getModel().getCurrentTetromino().rotateToLeft();
+        int i;
+        for (i = 0; i < 4; i++) {
+            if (this.tetrominoCanBePlacedOnPosition(
+                    this.getCurrentTetromino(),
+                    this.getModel().getCurrentTetrominoPositionLine(),
+                    this.getModel().getCurrentTetrominoPositionColumn() - i,
+                    this.getModel().getGrid())) {
+                break;
+            }
+        }
+        if (i == 4) {
+            this.getModel().getCurrentTetromino().rotateToRight();
+        } else {
+            this.getModel().setCurrentTetrominoPositionColumn(
+                    this.getModel().getCurrentTetrominoPositionColumn() - i
+            );
+        }
+    }
+
+    protected int shadowLine;
+
+    /**
+     * Add shadow tetromino.
+     */
+    public void addShadowInTheGridForCurrentTetromino() {
+        shadowLine = this.getModel().getCurrentTetrominoPositionLine();
+        while (this.tetrominoCanBePlacedOnPosition(
+                this.getCurrentTetromino(),
+                shadowLine,
+                this.getModel().getCurrentTetrominoPositionColumn(),
+                this.getModel().getGrid())) {
+            shadowLine++;
+        }
+        if (shadowLine >= this.getModel().getCurrentTetrominoPositionLine() + 4) {
+            this.addMatrixToGrid(this.getCurrentTetromino().getCurrentRotation(),
+                    Model_Color.WHITE,
+                    shadowLine - 1, this.getModel().getCurrentTetrominoPositionColumn(),
+                    this.getModel().getGrid());
+        }
+    }
+
+    /**
+     * Remove tetromino shadow.
+     */
+    public void removeShadowFromTheGrid() {
+        if (shadowLine >= this.getModel().getCurrentTetrominoPositionLine() + 4) {
+            this.removeMatrixFromGrid(this.getCurrentTetromino().getCurrentRotation(),
+                    shadowLine - 1, this.getModel().getCurrentTetrominoPositionColumn());
+        }
+    }
+
+    /**
+     * Update grid: clear lines.
+     */
+    public int updateCurrentGrid() {
+        return this.updateGrid(this.getModel().getGrid());
+    }
+
+    public int updateGrid(short[][] grid) {
+        int goodLines = 0;
+        for (int i = 0; i < grid.length; i++) {
+            boolean goodLine = true;
+            for (int j = 0; j < grid[i].length; j++) {
+                if (grid[i][j] == 0) {
+                    goodLine = false;
+                    break;
+                }
+            }
+
+            if (goodLine) {
+                goodLines++;
+                // Move all lines above i one level down.
+                for (int ii = i; ii > 0; ii--) {
+                    for (int j = 0; j < grid[ii].length; j++) {
+                        grid[ii][j] = grid[ii - 1][j];
+                    }
+                }
+
+                // Put 0 on last line.
+                for (int j = 0; j < grid[0].length; j++) {
+                    grid[0][j] = 0;
+                }
+            }
+        }
+        return goodLines;
+    }
+
+    /**
+     * Return true if it's possible for the current tetromino to be moved from current position to new position.
+     */
+    public boolean tetrominoCanFindAWayToPosition(Model_Tetromino t, int fromLine, int fromColumn, int newLine, int newColumn, short[][] grid) {
+        // It should be able to placed at final position.
+        if (!this.tetrominoCanBePlacedOnPosition(t, newLine, newColumn, grid)) {
+            return false;
+        }
+        // Does it have a path to (newLine, newColumn)?
+        return this.findPath(t, fromLine, fromColumn, newLine, newColumn, grid);
+    }
+
+    /**
+     * Argh. I'm just fed up making this game!
+     */
+    protected boolean findPath(Model_Tetromino t, int line, int column, int newLine, int newColumn, short[][] grid) {
+        short initialRotation = t.getCurrentRotationNumber();
+        boolean ok = this.findPathTryLeft(t, line, column, newLine, newColumn, grid);
+        if (!ok) {
+            t.setCurrentRotationNumber(initialRotation);
+            ok =this.findPathTryRight(t, line, column, newLine, newColumn, grid);
+        }
+        t.setCurrentRotationNumber(initialRotation);
+        return ok;
+    }
+
+    /**
+     * Return true if tetromino t can be correctly placed on (toLine, toColumn) from neighbour cell (fromLine, fromColumn) in the grid.
+     * Also tries to rotate it. If possible, then returns true and leaves the tetromino in the rotated position.
+     */
+    protected boolean tetrominoCanBePlacedOnPositionIfRotated(Model_Tetromino t, int fromLine, int fromColumn, int toLine, int toColumn, short[][] grid) {
+        if (this.tetrominoCanBePlacedOnPosition(t, toLine, toColumn, grid)) {
+            return true;
+        }
+        for (int i = 1; i <= 3; i++) {
+            t.rotateToLeft();
+            if (this.tetrominoCanBePlacedOnPosition(t, fromLine, fromColumn, grid)
+                    && this.tetrominoCanBePlacedOnPosition(t, toLine, toColumn, grid)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Argh. I'm just fed up making this game!
+     */
+    protected boolean findPathTryLeft(Model_Tetromino t, int fromLine, int fromColumn, int toLine, int toColumn, short[][] grid) {
+        int line, column;
+
+        // Move to the left from fromColumn to toColumn.
+        line = fromLine;
+        column = fromColumn;
+        while (column > toColumn) {
+            if (!this.tetrominoCanBePlacedOnPositionIfRotated(t, line, column, line, column - 1, grid)) {
+                return false;
+            }
+            column--;
+        }
+
+        boolean skipColumn;
+        while (column >= 0) {
+            skipColumn = false;
+            // Go down from fromLine to toLine.
+            line = fromLine;
+            while (line < toLine) {
+                if (!this.tetrominoCanBePlacedOnPositionIfRotated(t, line, column, line + 1, column, grid)) {
+                    skipColumn = true;
+                    break;
+                }
+                line++;
+            }
+            if (skipColumn) {
+                // Try again, if moving a bit more to the left.
+                column--;
+                continue;
+            }
+
+            // / Go right from column to toColumn.
+            int goBackColumn = column;
+            while (goBackColumn < toColumn) {
+                if (!this.tetrominoCanBePlacedOnPositionIfRotated(t, line, goBackColumn, line, goBackColumn + 1, grid)) {
+                    skipColumn = true;
+                    break;
+                }
+                goBackColumn++;
+            }
+
+            // Found a path!
+            if (!skipColumn) {
+                return true;
+            } else {
+                column--;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Argh. I'm just fed up making this game!
+     */
+    protected boolean findPathTryRight(Model_Tetromino t, int fromLine, int fromColumn, int toLine, int toColumn, short[][] grid) {
+        int line, column;
+
+        // Move to the right from fromColumn to toColumn.
+        line = fromLine;
+        column = fromColumn;
+        while (column < toColumn) {
+            if (!this.tetrominoCanBePlacedOnPositionIfRotated(t, line, column, line, column + 1, grid)) {
+                return false;
+            }
+            column++;
+        }
+
+        boolean skipColumn;
+        while (column <= Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID) {
+            skipColumn = false;
+            // Go down from fromLine to toLine.
+            line = fromLine;
+            while (line < toLine) {
+                if (!this.tetrominoCanBePlacedOnPositionIfRotated(t, line, column, line + 1, column, grid)) {
+                    skipColumn = true;
+                    break;
+                }
+                line++;
+            }
+            if (skipColumn) {
+                // Try again, if moving a bit more to the right.
+                column++;
+                continue;
+            }
+
+            // / Go left from column to toColumn.
+            int goBackColumn = column;
+            while (goBackColumn > toColumn) {
+                if (!this.tetrominoCanBePlacedOnPositionIfRotated(t, line, goBackColumn, line, goBackColumn - 1, grid)) {
+                    skipColumn = true;
+                    break;
+                }
+                goBackColumn--;
+            }
+
+            // Found a path!
+            if (!skipColumn) {
+                return true;
+            } else {
+                column++;
+            }
+        }
+        return false;
+    }
+}
+
+
+public class Controller_Player_Info extends Controller_Abstract
+{
+
+    /**
+     * Create controller.
+     */
+    public Controller_Player_Info(Controller_PlayerAbstract controller_player) {
+        super(controller_player, null, null);
+        this.view = new View_Player_Info(this, this.getParentController().getView());
+    }
+
+    public View_Player_Info getView() {
+        return (View_Player_Info) super.getView();
+    }
+
+    public Controller_PlayerAbstract getParentController() {
+        return (Controller_PlayerAbstract) super.getParentController();
+    }
+
+    public String getInfo()  {
+        return this.getParentController().getPlayerName();
+    }
+}
+
+
+public class Controller_Player_Next extends Controller_Abstract
+{
+    /**
+     * Create controller.
+     */
+    public Controller_Player_Next(Controller_PlayerAbstract controller_player) {
+        super(controller_player, null, null);
+        this.view = new View_Player_Next(this, this.getParentController().getView());
+    }
+
+    public View_Player_Next getView() {
+        return (View_Player_Next) super.getView();
+    }
+
+    public Controller_PlayerAbstract getParentController() {
+        return (Controller_PlayerAbstract) super.getParentController();
+    }
+
+    /**
+     * Get next tetromino.
+     */
+    public Model_Tetromino getNextTetromino() {
+        return this.getParentController().getNextTetromino();
+    }
+}
+
+
+public class Controller_Player_Score extends Controller_Abstract
+{
+    /**
+     * Create controller.
+     */
+    public Controller_Player_Score(Controller_PlayerAbstract controller_player) {
+        super(controller_player, null, null);
+        this.view = new View_Player_Score(this, this.getParentController().getView());
+    }
+
+    public View_Player_Score getView() {
+        return (View_Player_Score) super.getView();
+    }
+
+    public Controller_PlayerAbstract getParentController() {
+        return (Controller_PlayerAbstract) super.getParentController();
+    }
+
+    /**
+     * Get score as string.
+     */
+    public String getScore() {
+        return "" + this.getParentController().getScore();
+    }
+}
+
+
+public class Controller_PlayerHuman_Grid extends Controller_Player_Grid
+{
+    /**
+     * Create controller.
+     */
+    public Controller_PlayerHuman_Grid(Controller_PlayerHuman controller_player) {
+        super(controller_player);
+        this.view = new View_PlayerHuman_Grid(this, this.getParentController().getView());
+    }
+
+    public View_PlayerHuman_Grid getView() {
+        return (View_PlayerHuman_Grid) super.getView();
+    }
+
+    public Model_PlayerHuman getModel() {
+        return this.getParentController().getModel();
+    }
+
+    public Controller_PlayerHuman getParentController() {
+        return (Controller_PlayerHuman) super.getParentController();
+    }
+
+    public void newTetrominoOnGrid()  {
+        super.newTetrominoOnGrid();
+        this.getParentController().getParentController().incrementNumberOfMovesFromHumanPlayers();
+    }
+}
+
+
+public class Controller_PlayerHuman_Legend extends Controller_Abstract
+{
+    /**
+     * Create controller.
+     */
+    public Controller_PlayerHuman_Legend(Controller_PlayerHuman controller_player) {
+        super(controller_player, null, null);
+        this.view = new View_PlayerHuman_Legend(this, this.getParentController().getView());
+    }
+
+    public View_PlayerHuman_Legend getView() {
+        return (View_PlayerHuman_Legend) super.getView();
+    }
+
+    public Controller_PlayerHuman getParentController() {
+        return (Controller_PlayerHuman) super.getParentController();
+    }
+
+    /**
+     * Get legend.
+     */
+    public String getLegend()  {
+        return this.keyCodeToString(this.getParentController().getGridController().getView().MOVE_TETROMINO_KEY_RIGHT) + ":"
+                + " " + this.getParentController().getParentController().translate("move to right") + "\n"
+
+                + this.keyCodeToString(this.getParentController().getGridController().getView().MOVE_TETROMINO_KEY_LEFT) + ":"
+                + " " + this.getParentController().getParentController().translate("move to left") + "\n"
+
+                + this.keyCodeToString(this.getParentController().getGridController().getView().MOVE_TETROMINO_KEY_ROTATE_LEFT) + ":"
+                + " " + this.getParentController().getParentController().translate("rotate to left") + "\n"
+
+                + this.keyCodeToString(this.getParentController().getGridController().getView().MOVE_TETROMINO_KEY_DOWN) + ":"
+                + " " + this.getParentController().getParentController().translate("fall down one level") + "\n"
+
+                + this.keyCodeToString(this.getParentController().getGridController().getView().MOVE_TETROMINO_KEY_FALL) + ":"
+                + " " + this.getParentController().getParentController().translate("fall") + "\n";
+    }
+
+    /**
+     * Return key code string equivalent.
+     */
+    protected String keyCodeToString(int keyCode)  {
+        switch (keyCode) {
+            case UP:
+                return this.getParentController().getParentController().translate("UP-arrow");
+            case DOWN:
+                return this.getParentController().getParentController().translate("DOWN-arrow");
+            case LEFT:
+                return this.getParentController().getParentController().translate("LEFT-arrow");
+            case RIGHT:
+                return this.getParentController().getParentController().translate("RIGHT-arrow");
+            case 32:
+                return this.getParentController().getParentController().translate("SPACE");
+            default:
+            return String.fromCharCode(keyCode)
+        }
+    }
+}
+
+
+public class Controller_PlayerRobotGenetic_Grid extends Controller_Player_Grid
+{
+    /**
+     * Create controller.
+     */
+    public Controller_PlayerRobotGenetic_Grid(Controller_PlayerRobotGenetic controller_player) {
+        super(controller_player);
+        CHECK_TETROMINO_SHOULD_BE_CHANGED = 0;
+        this.view = new View_PlayerRobotGenetic_Grid(this, this.getParentController().getView());
+    }
+
+    public View_PlayerRobotGenetic_Grid getView() {
+        return (View_PlayerRobotGenetic_Grid) super.getView();
+    }
+
+    public Model_PlayerRobotGenetic getModel() {
+        return (Model_PlayerRobotGenetic) super.getModel();
+    }
+
+    public Controller_PlayerRobotGenetic getParentController() {
+        return (Controller_PlayerRobotGenetic) super.getParentController();
+    }
+}
+
+
+public class Controller_PlayerRobotRandom_Grid extends Controller_Player_Grid
+{
+    /**
+     * Create controller.
+     */
+    public Controller_PlayerRobotRandom_Grid(Controller_PlayerRobotRandom controller_player) {
+        super(controller_player);
+        this.view = new View_PlayerRobotRandom_Grid(this, this.getParentController().getView());
+    }
+
+    public View_PlayerRobotRandom_Grid getView() {
+        return (View_PlayerRobotRandom_Grid) super.getView();
+    }
+
+    public Model_PlayerRobotRandom getModel() {
+        return (Model_PlayerRobotRandom) super.getModel();
+    }
+
+    public Controller_PlayerRobotRandom getParentController() {
+        return (Controller_PlayerRobotRandom) super.getParentController();
+    }
+}
+
+
+public interface Controller
+{
+    /**
+     * Get parent controller.
+     */
+    public Controller getParentController();
+
+    /**
+     * Get view associated with this controller.
+     */
+    public View getView();
+
+    /**
+     * Get model associated with this controller.
+     */
+    public Model getModel();
+}
+
+
+public abstract class Controller_Abstract implements Controller
+{
+    protected Controller parentController;
+    protected Model model;
+    protected View view;
+
+    /**
+     * Create controller.
+     */
+    public Controller_Abstract() {
+
+    }
+
+    /**
+     * Create controller with view and model.
+     */
+    public Controller_Abstract(Controller parentController, View view, Model model) {
+        this.view = view;
+        this.model = model;
+        this.parentController = parentController;
+    }
+
+    public View getView() {
+        return this.view;
+    }
+
+    public Model getModel() {
+        return this.model;
+    }
+
+    public Controller getParentController() {
+        return this.parentController;
+    }
+
+}
+
+
+public class Controller_Background extends Controller_Abstract
+{
+    /**
+     * Create controller.
+     */
+    public Controller_Background(Controller_Tetris controller_tetris) {
+        super(controller_tetris, null, null);
+        this.view = new View_Background(this, controller_tetris.getView());
+    }
+
+    public View_Background getView() {
+        return (View_Background) super.getView();
+    }
+
+    public Controller_Tetris getParentController() {
+        return (Controller_Tetris)super.getParentController();
+    }
+}
+
+
+public class Controller_Language extends Controller_Abstract
+{
+    protected static String currentLanguage;
+
+    /**
+     * Create controller.
+     */
+    public Controller_Language(Controller_Tetris controller_tetris) {
+        super(controller_tetris, null, null);
+        this.model = new Model_Language_Collection();
+        this.view = new View_Language(this, controller_tetris.getView());
+    }
+
+    public Controller_Tetris getParentController() {
+        return (Controller_Tetris) super.getParentController();
+    }
+
+    public View_Language getView() {
+        return (View_Language) super.getView();
+    }
+
+    public Model_Language_Collection getModel() {
+        return (Model_Language_Collection) super.getModel();
+    }
+
+    /**
+     * Return available languages.
+     */
+    public Model_Language[] getAvailableLanguages() {
+        return this.getModel().getAllItems();
+    }
+
+    /**
+     * Get language.
+     */
+    public Model_Language getLanguage(String code) {
+        return this.getModel().getItem(code);
+    }
+
+    /**
+     * Set current language.
+     */
+    public void setCurrentLanguage(String currentL) {
+        currentLanguage = currentL;
+    }
+
+    /**
+     * Get current language.
+     */
+    public Model_Language getCurrentLanguage()  {
+        Model_Language language = this.getLanguage(currentLanguage);
+        if (language == null) {
+            return this.getDefaultLanguage();
+        }
+        return language;
+    }
+
+    /**
+     * Get default language.
+     */
+    public Model_Language getDefaultLanguage()  {
+        Model_Language language = this.getLanguage("en");
+        if (language == null) {
+            throw new Model_Exception(Controller_Tetris.translate("No current language set."));
+        }
+        return language;
+    }
+
+    /**
+     * Get icon url for given language model.
+     */
+    public String getIconLink(Model_Language language) {
+        return this.getParentController().getMediaBaseUrl() + language.getIconLink();
+    }
+}
+
+
+public abstract class Controller_PlayerAbstract implements Controller
+{
+    public static double PROBABILITY_TO_ADD_BAD_LINES = 0.25;
+    public static long counterAllPlayers = 0;
+    protected Controller_Tetris parentController;
+    protected Model_PlayerAbstract model;
+    protected View_Player view;
+    protected Controller_Player_Info infoController;
+    protected Controller_Player_Grid gridController;
+    protected Controller_Player_Score scoreController;
+    protected Controller_Player_Next nextController;
+
+    protected int score = 0;
+    protected Model_Tetromino nextTetromino;
+    protected int finalPlace = -1;
+    protected boolean gameOver = false;
+    protected int numberOfMoves = 0;
+
+    /**
+     * Create controller.
+     */
+    public Controller_PlayerAbstract(Controller_Tetris controller_tetris, Model_PlayerAbstract model)  {
+        this.parentController = controller_tetris;
+        this.model = model;
+        Controller_PlayerAbstract.counterAllPlayers++;
+        var name = Controller_Tetris.getParameterByName("p" + Controller_PlayerAbstract.counterAllPlayers + "_name");
+        if (name) {
+            this.getModel().setName(name);
+        }
+
+        var ptabl = Controller_Tetris.getParameterByName("ptabl");
+        if (ptabl) {
+            this.PROBABILITY_TO_ADD_BAD_LINES = ptabl;
+        }
+
+        switch (model.getType()) {
+            case Model_Player.PLAYER_TYPE_HUMAN:
+                this.view = new View_PlayerHuman((Controller_PlayerHuman) this, this.parentController.getView());
+                this.gridController = new Controller_PlayerHuman_Grid((Controller_PlayerHuman) this);
+                break;
+            case Model_Player.PLAYER_TYPE_ROBOT_RANDOM:
+                this.view = new View_PlayerRobotRandom((Controller_PlayerRobotRandom) this, this.parentController.getView());
+                this.gridController = new Controller_PlayerRobotRandom_Grid((Controller_PlayerRobotRandom) this);
+                break;
+            case Model_Player.PLAYER_TYPE_ROBOT_GENETIC:
+                this.view = new View_PlayerRobotGenetic((Controller_PlayerRobotGenetic) this, this.parentController.getView());
+                this.gridController = new Controller_PlayerRobotGenetic_Grid((Controller_PlayerRobotGenetic) this);
+                break;
+        }
+
+        this.infoController = new Controller_Player_Info(this);
+        this.nextController = new Controller_Player_Next(this);
+        this.scoreController = new Controller_Player_Score(this);
+    }
+
+
+    /**
+     * Get player model.
+     */
+    public Model_PlayerAbstract getModel() {
+        return model;
+    }
+
+    /**
+     * Get view player.
+     */
+    public View_Player getView() {
+        return view;
+    }
+
+    /**
+     * Get parent controller.
+     */
+    public Controller_Tetris getParentController() {
+        return parentController;
+    }
+
+    /**
+     * Get info controller.
+     */
+    public Controller_Player_Info getInfoController() {
+        return infoController;
+    }
+
+    /**
+     * Get grid controller.
+     */
+    public Controller_Player_Grid getGridController() {
+        return gridController;
+    }
+
+    /**
+     * Get score controller.
+     */
+    public Controller_Player_Score getScoreController() {
+        return scoreController;
+    }
+
+    /**
+     * Get next tetromino controller.
+     */
+    public Controller_Player_Next getNextController() {
+        return nextController;
+    }
+
+    /**
+     * Get store.
+     */
+    public int getScore() {
+        return score;
+    }
+
+    /**
+     * Get next tetromino.
+     */
+    public Model_Tetromino getNextTetromino() {
+        return nextTetromino;
+    }
+
+    /**
+     * Get player name associated with this controller.
+     */
+    public String getPlayerName()  {
+        return this.model.getName();
+    }
+
+    /**
+     * Set current tetromino.
+     */
+    public void setCurrentTetromino(Model_Tetromino currentTetromino) {
+        this.getGridController().setCurrentTetromino(currentTetromino);
+    }
+
+    /**
+     * Set next tetromino.
+     */
+    public void setNextTetromino(Model_Tetromino nextTetromino) {
+        this.nextTetromino = nextTetromino;
+    }
+
+    /**
+     * Get current tetromino.
+     */
+    public Model_Tetromino getCurrentTetromino()  {
+        return this.getGridController().getCurrentTetromino();
+    }
+
+    /**
+     * Get next tetromino for this player. If it's not already generated then generate a new one.
+     */
+    public void setNextTetrominoForPlayer()  {
+        this.numberOfMoves++;
+        Model_Tetromino t = this.getParentController().getNextTetromino(this.getPlayerName());
+        this.setNextTetromino(t);
+    }
+
+    /**
+     * Update score.
+     */
+    public void updateScore(int plus) {
+        this.score += plus;
+    }
+
+    /**
+     * Player got game over.
+     */
+    public void playerGameOver()  {
+        this.gameOver = true;
+        this.getParentController().gameOver(this.getPlayerName());
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    /**
+     * Get final place.
+     */
+    public int getFinalPlace() {
+        return finalPlace;
+    }
+
+    /**
+     * Set final place.
+     */
+    public void setFinalPlace(int finalPlace) {
+        this.finalPlace = finalPlace;
+    }
+
+    /**
+     * Player updated grid.
+     */
+    public void playerUpdatedGrid(int removedLines)  {
+        this.getParentController().playerUpdatedGrid(this.getPlayerName(), removedLines);
+    }
+
+    /**
+     * Called when other player removed lines from grid.
+     * With a probability, add 'bad' lines to rival players.
+     */
+    public void addBadLines(int removedLines) {
+        for (int k = 0; k < removedLines; k++) {
+            double random = Controller_Tetris.randomDouble();
+            if (random < PROBABILITY_TO_ADD_BAD_LINES) {
+                short[][] grid = this.getGridController().getModel().getGrid();
+
+                // Move up all the lines.
+                for (int i = 0; i < grid.length - 1; i++) {
+                    for (int j = 0; j < grid[i].length; j++) {
+                        grid[i][j] = grid[i + 1][j];
+                    }
+                }
+
+                // Add one bottom line.
+                for (int j = 0; j < grid[grid.length - 1].length; j++) {
+                    grid[grid.length - 1][j] = Model_Color.BLACK;
+                }
+                int randomPos = Controller_Tetris.randomInt(grid[grid.length - 1].length);
+                grid[grid.length - 1][randomPos] = Model_Color.NONE;
+                this.getGridController().getModel().setGrid(grid);
+            }
+        }
+    }
+
+    public String toString() {
+        this.getGridController().addCurrentTetrominoToCurentGrid();
+        String s = "";
+        if (this.getModel().getName() == null) {
+            try {
+                s += this.getPlayerName() + "\n";
+            } catch (Model_Exception ignored) {
+            }
+        }
+        s += this.getModel().toString();
+        this.getGridController().removeCurrentTetrominoFromGrid();
+        return s;
+    }
+
+    public int getNumberOfMoves() {
+        return numberOfMoves;
+    }
+
+    public int getT() {
+        return score % 3600 + numberOfMoves % 3600 + this.getModel().getType()
+                + Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID
+                + Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID;
+    }
+}
+
+
+public class Controller_PlayerHuman extends Controller_PlayerAbstract
+{
+    public static int counter = 0;
+    protected int countedAs;
+    protected Controller_PlayerHuman_Legend legendController;
+
+    /**
+     * Create controller.
+     */
+    public Controller_PlayerHuman(Controller_Tetris controller_tetris, Model_PlayerHuman model)  {
+        super(controller_tetris, model);
+        this.legendController = new Controller_PlayerHuman_Legend(this);
+        counter++;
+        this.countedAs = counter;
+    }
+
+    public Model_PlayerHuman getModel() {
+        return (Model_PlayerHuman) super.getModel();
+    }
+
+    public View_PlayerHuman getView() {
+        return (View_PlayerHuman) super.getView();
+    }
+
+    public Controller_PlayerHuman_Grid getGridController() {
+        return (Controller_PlayerHuman_Grid) super.getGridController();
+    }
+
+    /**
+     * Get legend controller.
+     */
+    public Controller_PlayerHuman_Legend getLegendController() {
+        return legendController;
+    }
+
+    public String getPlayerName()  {
+        String playerName = super.getPlayerName();
+        if (playerName == null) {
+            playerName = Controller_Tetris.translate("Human player") + (countedAs != 1 ? " " + countedAs : "");
+        }
+        return playerName;
+    }
+}
+
+
+public abstract class Controller_PlayerRobot extends Controller_PlayerAbstract
+{
+    public long MIN_TIME_TO_MOVE = 200;
+    public long MAX_TIME_TO_MOVE = 4000;
+    protected long lastTimeMoved = 0;
+    protected int lastSavedNumberOfMovesFromHumanPlayers = 0;
+
+    /**
+     * Create controller.
+     */
+    public Controller_PlayerRobot(Controller_Tetris controller_tetris, Model_PlayerRobot model)  {
+        super(controller_tetris, model);
+        this.getGridController().disableFalling();
+    }
+
+    public Model_PlayerRobot getModel() {
+        return (Model_PlayerRobot) super.getModel();
+    }
+
+    public View_PlayerRobot getView() {
+        return (View_PlayerRobot) super.getView();
+    }
+
+    /**
+     * Ready to make a move?
+     */
+    public boolean isReady() {
+        boolean timeToMove = false;
+        int time = millis();
+
+        long diff = this.getParentController().getNumberOfMovesFromHumanPlayers() - this.lastSavedNumberOfMovesFromHumanPlayers;
+        timeToMove =
+                // If all human players made a move then robot should make a move as well.
+                ((diff >= Controller_PlayerHuman.counter) && (time - this.lastTimeMoved >= MIN_TIME_TO_MOVE))
+                        // OR if max time to move...
+                        || (time - this.lastTimeMoved >= MAX_TIME_TO_MOVE);
+        if (timeToMove) {
+            this.lastSavedNumberOfMovesFromHumanPlayers += Controller_PlayerHuman.counter;
+        }
+        return timeToMove;
+    }
+
+    /**
+     * Find next move. Set nextTetrominoPositionLine and nextTetrominoPositionColumn.
+     * @
+     */
+    public abstract void findNextMove() ;
+
+    /**
+     * Make next move.
+     */
+    public void makeNextMove()  {
+        this.lastTimeMoved = millis();
+        this.getModel().setCurrentTetrominoPositionLine(
+                this.getModel().getNextTetrominoPositionLine()
+        );
+        this.getModel().setCurrentTetrominoPositionColumn(
+                this.getModel().getNextTetrominoPositionColumn()
+        );
+    }
+}
+
+
+public class Controller_PlayerRobotGenetic extends Controller_PlayerRobot
+{
+    public static long counter = 0;
+    public static double EVALUATION_CURRENT_GRID_IMPORTANCE = 0.5;
+    public static double EVALUATION_NEXT_TETROMINO_IMPORTANCE = 0.25;
+    public static double EVALUATION_ALL_TETROMINOES_IMPORTANCE = 0.25;
+    public static double DEFAULT_ACCURACY_HOW_MANY_POSITIONS_TO_CHECK_IN_ADVANCE_PERCENTAGE = 1;
+    public double ACCURACY_HOW_MANY_POSITIONS_TO_CHECK_IN_ADVANCE_PERCENTAGE = DEFAULT_ACCURACY_HOW_MANY_POSITIONS_TO_CHECK_IN_ADVANCE_PERCENTAGE;
+    protected final int NO_F_SET = -100000;
+
+    protected long countedAs;
+    protected Model_Tetromino[] tetrominoes = null;
+
+    /**
+     * Create controller.
+     */
+    public Controller_PlayerRobotGenetic(Controller_Tetris controller_tetris, Model_PlayerRobotGenetic model)  {
+        super(controller_tetris, model);
+        counter++;
+        this.countedAs = counter;
+        var ahmptciap = Controller_Tetris.getParameterByName("p" + Controller_PlayerAbstract.counterAllPlayers + "_ahmptciap");
+        if (ahmptciap) {
+            this.ACCURACY_HOW_MANY_POSITIONS_TO_CHECK_IN_ADVANCE_PERCENTAGE = ahmptciap;
+        }
+        double[] weightsFromParams;
+        for (var i=0; i < 6; i++) {
+            var w = Controller_Tetris.getParameterByName("p" + Controller_PlayerAbstract.counterAllPlayers + "_w" + i);
+            if (w) {
+                if (weightsFromParams == null) {
+                    weightsFromParams = new double[6];
+                }
+                weightsFromParams[i] = w;
+            }
+        }
+        if (weightsFromParams) {
+            this.getModel().setWeights(weightsFromParams);
+        }
+    }
+
+    public Model_PlayerRobotGenetic getModel() {
+        return (Model_PlayerRobotGenetic) super.getModel();
+    }
+
+    public View_PlayerRobotGenetic getView() {
+        return (View_PlayerRobotGenetic) super.getView();
+    }
+
+    public String getPlayerName()  {
+        String playerName = super.getPlayerName();
+        if (playerName == null) {
+            playerName = Controller_Tetris.translate("Robot Genetic") + (countedAs != 1 ? " " + countedAs : "");
+        }
+        return playerName;
+    }
+
+    protected boolean evaluateInAdvanceCurrentVal = true;
+
+
+
+
+
+    public void findNextMove()  {
+        double[] result = this.findBestPositionForCurrentTetrominoInCurrentGrid();
+        int besti = (int) result[0];
+        int bestj = (int) result[1];
+        int bestk = (int) result[2];
+        if (besti != -1 && bestj != -1 && bestk != -1) {
+            this.getModel().setNextTetrominoPositionLine(besti);
+            this.getModel().setNextTetrominoPositionColumn(bestj);
+            for (int l = 1; l <= bestk; l++) {
+                this.getCurrentTetromino().rotateToLeft();
+            }
+        }
+    }
+
+    public double[] findBestPositionForCurrentTetrominoInCurrentGrid()  {
+        return this.findBestPositionInAdvance(
+                true,
+                this.getCurrentTetromino(),
+                this.getModel().getCurrentTetrominoPositionLine(),
+                this.getModel().getCurrentTetrominoPositionColumn(),
+                this.getModel().getGrid()
+        );
+    }
+
+    public double[] findBestPositionInAdvance(boolean evaluateInAdvance, Model_Tetromino t, int currentPosLine, int currentPosColumn, short[][] grid)  {
+        this.evaluateInAdvanceCurrentVal = evaluateInAdvance;
+        int besti = -1, bestj = -1, bestk = -1;
+        double bestf = NO_F_SET;
+
+//        //Test tetrominoCanFindAWayToPosition function. why are you seeing this anyway?
+//        t= Model_Tetromino_Factory.getInstance().createTetromino(Model_Tetromino_Factory.TETROMINO_TYPE_I);
+//        //t.rotateToLeft();
+//        short [][] gridc = this.getGridCopy(this.getModel().getGrid());
+//        int TOL= 9;
+//        int TOC = 0;
+//        short[][] ADD = new short[][] {
+//                {1, 0, 1, 0, 1},
+//                {1, 0, 1, 0, 0},
+//                {1, 0, 1, 0, 1},
+//                {1, 0, 1, 0, 0},
+//                {1, 1},
+//        };
+//
+//        currentPosLine = 9;
+//        currentPosColumn = 3;
+//        int toLine= 9;
+//        int toColumn = 1;
+//
+//        this.getParentController().getLogger().log("Tetromino:\n" + t.toStringOnlyCurrentPosition() +
+//        " from (" + currentPosLine + " " + currentPosColumn + ") to (" + toLine + " " + toColumn + ")\n");
+//        this.getGridController().addMatrixToGrid(ADD,(short)5, TOL, TOC, gridc) ;
+//        this.getParentController().getLogger().log("Grid After:\n" + this.gridToString(gridc));
+//        this.getParentController().getLogger().log( "" +
+//                this.getGridController().tetrominoCanFindAWayToPosition(t, currentPosLine, currentPosColumn, toLine, toColumn, gridc)
+//                );
+//        System.exit(0);
+
+        if (false) {
+        }
+
+        // Find the best position (besti, bestj) for current tetromino rotated bestk times by 90 degrees to the left.
+        for (int k = 0; k <= 3; k++) {
+            if (!t.currentRotationIsDuplicated()) {
+                if (false) {
+                }
+                for (int i = currentPosLine; i < grid.length; i++) {
+                    for (int j = 0; j < grid[i].length; j++) {
+                        // Check this position always when evaluateInAdvance is true.
+                        // If evaluateInAdvance is false then don't check this position unless accuracy is good.
+                        if ((evaluateInAdvance || Controller_Tetris.randomDouble() < ACCURACY_HOW_MANY_POSITIONS_TO_CHECK_IN_ADVANCE_PERCENTAGE)
+                                // And is it a final position?
+                                && this.getGridController().tetrominoCanBePlacedOnPosition(t, i, j, grid)
+                                && !this.getGridController().tetrominoCanBePlacedOnPosition(t, i + 1, j, grid)) {
+                            // Can current tetromino can be moved to this position?
+                            if (this.getGridController().tetrominoCanFindAWayToPosition(t, currentPosLine, currentPosColumn, i, j, grid)) {
+                                if (false) {
+                                }
+                                // Evaluate this position.
+                                double f = this.evaluatePosition(t, i, j, grid, evaluateInAdvance);
+                                if (evaluateInAdvance) {
+                                    if (false) {
+                                    }
+                                } else {
+                                    if (false) {
+                                    }
+                                }
+                                if (f > bestf) {
+                                    besti = i;
+                                    bestj = j;
+                                    bestk = k;
+                                    bestf = f;
+                                    if (false) {
+                                    }
+                                } else {
+                                    if (false) {
+                                    }
+                                }
+                            } else {
+                                if (false) {
+                                }
+                            }
+                        }
+                    }
+                }
+                if (false) {
+                }
+            }
+            t.rotateToLeft();
+        }
+        if (evaluateInAdvance) {
+            if (false) {
+            }
+            if (false) {
+            }
+            if (false) {
+            }
+        }
+        if (false) {
+        }
+        return new double[]{besti, bestj, bestk, bestf};
+    }
+
+    short[][] gridCopyInAdvanceTrue = new short[Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID][Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID];
+    short[][] gridCopyInAdvanceFalse = new short[Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID][Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID];
+
+    protected short[][] getGridCopy(short[][] grid) {
+        short[][] gridCopy = this.evaluateInAdvanceCurrentVal ? gridCopyInAdvanceTrue : gridCopyInAdvanceFalse;
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                gridCopy[i][j] = grid[i][j];
+            }
+        }
+        return gridCopy;
+    }
+
+    /**
+     * Evaluate how good this position is.
+     */
+    public double evaluatePosition(Model_Tetromino t, int line, int column, short[][] grid, boolean evaluateInAdvance)  {
+        if (evaluateInAdvance) {
+            if (false) {
+            }
+        }
+        short[][] gridCopy = this.getGridCopy(grid);
+        double f = this.evaluateGrid(grid, gridCopy, t, line, column);
+        if (evaluateInAdvance) {
+            if (false) {
+            }
+            // Final evaluation =  EVALUATION_CURRENT_GRID_IMPORTANCE * f(currentGrid)
+            // + EVALUATION_ALL_TETROMINOES_IMPORTANCE * f(move in advance once - all tetrominoes)
+            // + EVALUATION_NEXT_TETROMINO_IMPORTANCE * f(move in advance once - next tetromino)
+            f = EVALUATION_CURRENT_GRID_IMPORTANCE * f;
+            double missedToCheckPercentage = 0;
+            for (Model_Tetromino tetromino : this.getAllTetrominoes()) {
+                double[] result = this.findBestPositionInAdvance(false, tetromino, 0,
+                        int(Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID / 2)
+                        , gridCopy);
+                this.evaluateInAdvanceCurrentVal = true;
+                double bestf = result[3];
+                if (bestf != NO_F_SET) {
+                    f += EVALUATION_ALL_TETROMINOES_IMPORTANCE / this.getAllTetrominoes().length * bestf;
+                } else {
+                    missedToCheckPercentage += EVALUATION_ALL_TETROMINOES_IMPORTANCE / this.getAllTetrominoes().length;
+                }
+
+                if (tetromino.getCode().equals(this.getNextTetromino().getCode())) {
+                    if (bestf != NO_F_SET) {
+                        f += EVALUATION_NEXT_TETROMINO_IMPORTANCE * bestf;
+                    } else {
+                        missedToCheckPercentage += EVALUATION_NEXT_TETROMINO_IMPORTANCE;
+                    }
+                }
+            }
+
+            // If evaluation in advance for some tetrominoes did result in NO_F_SET then it was ignored before.
+            // Now rescale f.
+            f = f / (1 - missedToCheckPercentage);
+        }
+
+        return f;
+    }
+
+    protected Model_Tetromino[] getAllTetrominoes()  {
+        if (this.tetrominoes == null) {
+            this.tetrominoes = Model_Tetromino_Factory.getInstance().getAllTetrominoes();
+        }
+        return this.tetrominoes;
+    }
+
+    /**
+     * Evaluate grid depending on the weights and the values of the parameters for current grid.
+     */
+    public double evaluateGrid(short[][] gridBefore, short[][] gridAfter, Model_Tetromino t, int line, int column)  {
+        // Before
+            if (false) {
+            }
+        int[] paramsBefore = !this.evaluateInAdvanceCurrentVal
+                ? this.gridBeforeParams
+                : this.evaluateGridParams(gridBefore);
+        int maxHeightBefore = paramsBefore[0];
+        int noOfHolesBefore = paramsBefore[1];
+        int noOfBlockadesBefore = paramsBefore[2];
+        int freeSpaceBefore = paramsBefore[3];
+        int noOfNeighboursBefore = paramsBefore[4];
+
+        // Go ahead with the game.
+        this.getGridController().addTetrominoToGrid(t, line, column, gridAfter);
+        int noOfClearedLines = this.getGridController().updateGrid(gridAfter);
+
+        // After
+        if (false) {
+        }
+        int[] paramsAfter = this.evaluateGridParams(gridAfter);
+        if (this.evaluateInAdvanceCurrentVal) {
+            if (false) {
+            }
+            this.saveGridBeforeParams(paramsAfter);// current gridAfter will be gridBefore for next move.
+        }
+        int maxHeightAfter = paramsAfter[0];
+        int noOfHolesAfter = paramsAfter[1];
+        int noOfBlockadesAfter = paramsAfter[2];
+        int freeSpaceAfter = paramsAfter[3];
+        int noOfNeighboursAfter = paramsAfter[4];
+        if (false) {
+        }
+
+        return this.getModel().getEvaluationFunction().evaluate(
+                this.getModel().getWeights(),
+                gridAfter,
+                maxHeightBefore, maxHeightAfter,
+                noOfHolesBefore, noOfHolesAfter,
+                noOfBlockadesBefore, noOfBlockadesAfter,
+                freeSpaceBefore, freeSpaceAfter,
+                noOfNeighboursBefore, noOfNeighboursAfter,
+                noOfClearedLines
+        );
+    }
+
+    private int[] gridBeforeParams;
+
+    protected void saveGridBeforeParams(int[] gridParams) {
+        this.gridBeforeParams = gridParams;
+    }
+
+    protected int[] noOfFilledGridCellsFoundOnColumn = new int[Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID];
+    protected int[] noOfBlockadesForColumn = new int[Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID];
+
+    protected int[] evaluateGridParams(short[][] grid) {
+        int maxHeight = 0;
+        int noOfHoles = 0;
+        int noOfBlockades = 0;
+        int freeSpace = 0;
+        int noOfNeighbours = 0;
+
+        // Init data.
+        for (int i = 0; i < noOfFilledGridCellsFoundOnColumn.length; i++) {
+            noOfFilledGridCellsFoundOnColumn[i] = 0;
+        }
+        for (int i = 0; i < noOfBlockadesForColumn.length; i++) {
+            noOfBlockadesForColumn[i] = 0;
+        }
+
+        // From highest row to lowest row
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                if (grid[i][j] == 0) {
+                    // Empty cell!
+
+                    if (noOfFilledGridCellsFoundOnColumn[j] > 0) {
+                        // Number of holes increased.
+                        noOfHoles++;
+                    } else {
+                        // Free space increased.
+                        freeSpace++;
+                    }
+
+                    // Set number of blockades for column j.
+                    noOfBlockadesForColumn[j] = noOfFilledGridCellsFoundOnColumn[j];
+                } else {
+                    // Filled cell!
+                    noOfFilledGridCellsFoundOnColumn[j]++;
+
+                    if (grid.length - i > maxHeight) {
+                        // Max height updated.
+                        maxHeight = grid.length - i;
+                    }
+
+                    // Number of neighbours increased.
+                    noOfNeighbours += this.numberOfNeighbours(grid, i, j);
+                }
+            }
+        }
+
+        // Finalise data.
+        for (int i = 0; i < noOfBlockadesForColumn.length; i++) {
+            noOfBlockades += noOfBlockadesForColumn[i];
+        }
+
+        if (false) {
+        }
+        return new int[]{maxHeight, noOfHoles, noOfBlockades, freeSpace, noOfNeighbours};
+    }
+
+    protected int numberOfNeighbours(short[][] grid, int i, int j) {
+        return this.numberOfNeighboursValueOf(grid, i, j - 1)
+                + this.numberOfNeighboursValueOf(grid, i - 1, j - 1)
+                + this.numberOfNeighboursValueOf(grid, i - 1, j)
+                + this.numberOfNeighboursValueOf(grid, i - 1, j + 1)
+                + this.numberOfNeighboursValueOf(grid, i, j + 1)
+                + this.numberOfNeighboursValueOf(grid, i + 1, j + 1)
+                + this.numberOfNeighboursValueOf(grid, i + 1, j)
+                + this.numberOfNeighboursValueOf(grid, i + 1, j - 1);
+    }
+
+    protected int numberOfNeighboursValueOf(short[][] grid, int i, int j) {
+        if (i < 0 || i >= grid.length || j < 0 || j >= grid[i].length) {
+            return 2;// out-of-grid is considered as very good, i.e. it counts as 2 neighbours
+        }
+        return grid[i][j] == 0 ? 0 : 1;
+    }
+
+    public String getWeightsAsString() {
+        String s = "";
+        for (int i = 0; i < this.getModel().getWeights().length; i++) {
+            s += this.getModel().getWeight(i) + " ";
+        }
+        return s;
+    }
+
+    public String toString() {
+        return super.toString()
+                .replace("Grid", String.format("Chromosome: %s\nGrid", this.getWeightsAsString()))
+                ;
+    }
+}
+
+
+public class Controller_PlayerRobotRandom extends Controller_PlayerRobot
+{
+    public static int counter = 0;
+    protected int countedAs;
+
+    /**
+     * Create controller.
+     */
+    public Controller_PlayerRobotRandom(Controller_Tetris controller_tetris, Model_PlayerRobotRandom model)  {
+        super(controller_tetris, model);
+        counter++;
+        this.countedAs = counter;
+    }
+
+    public Model_PlayerRobotRandom getModel() {
+        return (Model_PlayerRobotRandom) super.getModel();
+    }
+
+    public View_PlayerRobotRandom getView() {
+        return (View_PlayerRobotRandom) super.getView();
+    }
+
+    public String getPlayerName()  {
+        String playerName = super.getPlayerName();
+        if (playerName == null) {
+            playerName = Controller_Tetris.translate("Robot Random") + (countedAs != 1 ? " " + countedAs : "");
+        }
+        return playerName;
+    }
+
+    public void findNextMove()  {
+        int line = this.getModel().getCurrentTetrominoPositionLine();
+        int column = this.getModel().getCurrentTetrominoPositionColumn();
+        int newLine, newColumn;
+        int tries = 0;
+        do {
+            tries++;
+            int maxRandomLine = Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID - line - 1;
+            newLine = line + (maxRandomLine <= 0 ? 1 : Controller_Tetris.randomInt(maxRandomLine) + 1);
+            newColumn = Controller_Tetris.randomInt(Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID);
+        }
+        while (!this.getGridController().tetrominoCanFindAWayToPosition(
+                this.getCurrentTetromino(),
+                this.getModel().getCurrentTetrominoPositionLine(),
+                this.getModel().getCurrentTetrominoPositionColumn(),
+                newLine, newColumn, this.getModel().getGrid())
+                && tries < 20);
+        if (tries < 20) {
+            this.getModel().setNextTetrominoPositionColumn(newColumn);
+            this.getModel().setNextTetrominoPositionLine(newLine);
+        } else {
+            if (this.getGridController().tetrominoCanBePlacedOnPosition(
+                    this.getCurrentTetromino(),
+                    line + 1,
+                    column,
+                    this.getModel().getGrid()
+            )) {
+                this.getModel().setNextTetrominoPositionColumn(column);
+                this.getModel().setNextTetrominoPositionLine(line + 1);
+            } else {
+                this.getModel().setNextTetrominoPositionColumn(column);
+                this.getModel().setNextTetrominoPositionLine(line);
+            }
+        }
+    }
+}
+
+
+public class Controller_Restart extends Controller_Abstract
+{
+
+    /**
+     * Create controller.
+     */
+    public Controller_Restart(Controller_Tetris controller_tetris) {
+        super(controller_tetris, null, null);
+        this.view = new View_Restart(this, controller_tetris.getView());
+    }
+
+    public Controller_Tetris getParentController() {
+        return (Controller_Tetris) super.getParentController();
+    }
+
+    public View_Restart getView() {
+        return (View_Restart) super.getView();
+    }
+
+    /**
+     * Get Restart game message.
+     */
+    public String getRestartMessage()  {
+        return Controller_Tetris.translate("Restart");
+    }
+}
+
+
+
+public class Controller_Tetris extends Controller_Abstract
+{
+    public static int NUMBER_OF_LINES_TETRIS_GRID = 20;
+    public static int NUMBER_OF_COLUMNS_TETRIS_GRID = 10;
+    public boolean STOP_GAME_ON_FIRST_PLAYER_GAME_OVER = true;
+
+    protected Controller_Background backgroundController;
+    protected Controller_Title titleController;
+    protected static Controller_Language languageController;
+    protected static Controller_Translator translatorController;
+    protected Controller_Restart restartController;
+    protected Controller_PlayerAbstract[] playerControllers;
+
+    public static int MAX_TETROMINOES_TO_SAVE = 10;
+    // The tetrominoes generated will be saved here.
+    protected Model_Tetromino[] tetrominoes;
+    protected int tPos = -1;
+    // Each player is currently having one of the tetrominoes here.
+    protected int[] playersTetrominoesPos;
+
+    // Mark gave-over status for players.
+    protected int playersGameOver;
+    // Count when human players move. It will be used by robots to move when humans move.
+    protected long numberOfMovesFromHumanPlayers = 0;
+
+    protected String baseMediaUrl = "";
+    protected boolean gameOver = false;
+    protected boolean gameStarted = false;
+
+
+
+    public Controller_Tetris(View_Tetris view) {
+        super(null, view, null);
+
+        if (view.GAME_STATE == View_Tetris.GAME_STATE_IN_GAME) {
+            // Create translator.
+            translatorController = new Controller_Translator(this);
+
+            // Create language controller.
+            languageController = new Controller_Language(this);
+
+            // Create background controller.
+            this.backgroundController = new Controller_Background(this);
+
+            // Create title controller.
+            this.titleController = new Controller_Title(this);
+
+            // Create restart game controller.
+            this.restartController = new Controller_Restart(this);
+        }
+    }
+
+    public View_Tetris getView() {
+        return (View_Tetris) super.getView();
+    }
+
+    public Model_Tetris getModel() {
+        return (Model_Tetris) super.getModel();
+    }
+
+    /**
+     * Get random double number.
+     */
+    public static double randomDouble() {
+        return Math.random();
+    }
+
+    /**
+     * Get random boolean value.
+     */
+    public static boolean randomBoolean() {
+        return Math.random() < 0.5;
+    }
+
+    /**
+     * Get random int number.
+     */
+    public static int randomInt(int max) {
+        return Math.floor(Math.random()*max) % max;
+    }
+
+    /**
+     * Start game.
+     */
+    public void startGame(int[] playersTypes)  {
+        // Create model.
+        this.model = new Model_Tetris(playersTypes, NUMBER_OF_LINES_TETRIS_GRID, NUMBER_OF_COLUMNS_TETRIS_GRID);
+
+        // Create player controllers.
+        this.createPlayerControllers(this.getModel().getPlayers());
+
+        // Game just started.
+        this.playersGameOver = 0;
+
+        // Make first move.
+        this.tetrominoes = new Model_Tetromino[MAX_TETROMINOES_TO_SAVE];
+        this.playersTetrominoesPos = new int[this.getModel().getNumberOfPlayers()];
+        this.generateNewTetromino();
+        for (int i = 0; i < this.getModel().getNumberOfPlayers(); i++) {
+            this.playerControllers[i].setCurrentTetromino(new Model_Tetromino(this.tetrominoes[tPos]));
+        }
+
+        // Prepare next move.
+        this.generateNewTetromino();
+        for (int i = 0; i < this.playerControllers.length; i++) {
+            this.playersTetrominoesPos[i] = this.tPos;
+            this.playerControllers[i].setNextTetromino(new Model_Tetromino(this.tetrominoes[tPos]));
+        }
+    }
+
+    /**
+     * Create new random tetromino and add it at tPos.
+     */
+    public Model_Tetromino generateNewTetromino()  {
+        // Get random tetromino.
+        int maxRandomType = this.getModel().getNumberOfTetrominos();
+        var randomType = Math.floor(Math.random()*maxRandomType) % maxRandomType;
+        Model_Tetromino t = this.getModel().getTetrominosFactory().createTetromino(randomType);
+
+        // Save it.
+        tPos++;
+        tPos = tPos % MAX_TETROMINOES_TO_SAVE;
+        this.tetrominoes[tPos] = t;
+        return t;
+    }
+
+    /**
+     * Create player controllers from player models.
+     */
+    protected void createPlayerControllers(Model_Player[] players)  {
+        this.playerControllers = new Controller_PlayerAbstract[players.length];
+        for (int i = 0; i < players.length; i++) {
+            switch (players[i].getType()) {
+                case Model_Player.PLAYER_TYPE_HUMAN:
+                    this.playerControllers[i] = new Controller_PlayerHuman(this, (Model_PlayerHuman) players[i]);
+                    break;
+                case Model_Player.PLAYER_TYPE_ROBOT_RANDOM:
+                    this.playerControllers[i] = new Controller_PlayerRobotRandom(this, (Model_PlayerRobotRandom) players[i]);
+                    break;
+                case Model_Player.PLAYER_TYPE_ROBOT_GENETIC:
+                    this.playerControllers[i] = new Controller_PlayerRobotGenetic(this, (Model_PlayerRobotGenetic) players[i]);
+            }
+        }
+    }
+
+    public String toString() {
+        return this.getModel().toString();
+    }
+
+    /**
+     * Get title controller.
+     */
+    public Controller_Title getTitleController() {
+        return titleController;
+    }
+
+    /**
+     * Get background controller.
+     */
+    public Controller_Background getBackgroundController() {
+        return backgroundController;
+    }
+
+    /**
+     * Get language controller.
+     */
+    public Controller_Language getLanguageController() {
+        return languageController;
+    }
+
+    /**
+     * Get translator controller.
+     */
+    public Controller_Translator getTranslatorController() {
+        return translatorController;
+    }
+
+    /**
+     * Get restart game controller.
+     */
+    public Controller_Restart getRestartController() {
+        return restartController;
+    }
+
+    /**
+     * Get players controllers.
+     */
+    public Controller_PlayerAbstract[] getPlayerControllers() {
+        return playerControllers;
+    }
+
+    /**
+     * Get app title.
+     */
+    public String getTitle()  {
+        return this.titleController.getTitle();
+    }
+
+    /**
+     * Translate a string in current language.
+     */
+    public static String translate(String s)  {
+        return translatorController != null
+                ? translatorController.translate(s, languageController.getCurrentLanguage().getCode())
+                : s;
+    }
+
+    /**
+     * Get where media folder's base.
+     */
+    public String getMediaBaseUrl() {
+        return baseMediaUrl;
+    }
+
+    /**
+     * Set media folder's base.
+     */
+    public void setBaseMediaUrl(String s) {
+        this.baseMediaUrl = s;
+    }
+
+    /**
+     * Get number of players.
+     */
+    public int getNumberOfPlayers() {
+        return this.playerControllers.length;
+    }
+
+    /**
+     * Get number of players of given type.
+     */
+    public int getNumberOfPlayers(int type) {
+        int n = 0;
+        for (Controller_PlayerAbstract p : this.playerControllers) {
+            if (p.getModel().getType() == type) {
+                n++;
+            }
+        }
+        return n;
+    }
+
+    public String getAppUrl(boolean includeCurrentLanguageCode)  {
+        var appUrl = document.location.origin;
+        if (!appUrl) {
+            appUrl = document.location.protocol + "//" + document.location.host;
+        }
+        if (includeCurrentLanguageCode) {
+            Model_Language currentLanguage = languageController.getCurrentLanguage();
+            if (!currentLanguage.isDefault()) {
+                appUrl += "/" + currentLanguage.getCode();
+            }
+        }
+        return appUrl + "/";
+    }
+
+    /**
+     * Get player pos by player name.
+     */
+    public int getPlayerPosByPlayerName(String playerName)  {
+        for (int i = 0; i < this.playerControllers.length; i++) {
+            if (this.playerControllers[i].getPlayerName().equals(playerName)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * All players will get the same tetrominoes. Each of them has a current tetromino. Return next tetromino for given player.
+     */
+    public Model_Tetromino getNextTetromino(String playerName)  {
+        int playerPos = this.getPlayerPosByPlayerName(playerName);
+        if (this.playersTetrominoesPos[playerPos] == tPos) {
+            this.generateNewTetromino();
+        }
+        this.playersTetrominoesPos[playerPos]++;
+        this.playersTetrominoesPos[playerPos] %= MAX_TETROMINOES_TO_SAVE;
+        return new Model_Tetromino(this.tetrominoes[this.playersTetrominoesPos[playerPos]]);
+    }
+
+    /**
+     * Player playerName lost the game
+     */
+    public void gameOver(String playerName)  {
+        int playerPos = this.getPlayerPosByPlayerName(playerName);
+
+        if (this.STOP_GAME_ON_FIRST_PLAYER_GAME_OVER) {
+            for (int i = 0; i < this.playerControllers.length; i++) {
+                this.playerControllers[i].setGameOver(true);
+            }
+            this.playersGameOver = this.playerControllers.length;
+
+            // Update final places.
+            if (playerControllers.length == 1) {
+                this.playerControllers[0].setFinalPlace(1);
+            } else for (int i = 0; i < this.playerControllers.length; i++) {
+                if (i != playerPos) {
+                    // @todo If more than 2 players, need to change setting the final place.
+                    this.playerControllers[i].setFinalPlace(1);
+                } else {
+                    this.playerControllers[i].setFinalPlace(2);
+                }
+            }
+        } else {
+            this.playerControllers[playerPos].setGameOver(true);
+            this.playerControllers[playerPos].setFinalPlace(this.playerControllers.length - this.playersGameOver);
+            this.playersGameOver++;
+        }
+        this.gameOver = this.playersGameOver >= this.playerControllers.length;
+    }
+
+    /**
+     * Is game over?
+     */
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    public int getPlayersGameOver() {
+        return playersGameOver;
+    }
+
+    /**
+     * Player updated grid. Add lines to other players.
+     */
+    public void playerUpdatedGrid(String playerName, int removedLines)  {
+        if (removedLines != 0) {
+            for (int i = 0; i < this.playerControllers.length; i++) {
+                if (!this.playerControllers[i].getPlayerName().equals(playerName)
+                        && !this.playerControllers[i].isGameOver()) {
+                    this.playerControllers[i].addBadLines(removedLines);
+                }
+            }
+        }
+    }
+
+    public void setGameStarted(boolean gameStarted) {
+        this.gameStarted = gameStarted;
+    }
+
+    public boolean isGameStarted() {
+        return gameStarted;
+    }
+
+
+
+
+
+    public void incrementNumberOfMovesFromHumanPlayers() {
+        this.numberOfMovesFromHumanPlayers++;
+    }
+
+    public long getNumberOfMovesFromHumanPlayers() {
+        return numberOfMovesFromHumanPlayers;
+    }
+
+    public static String getParameterByName(String name) {
+        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                results = regex.exec(location.search);
+        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+}
+
+public class Controller_Title extends Controller_Abstract
+{
+
+    /**
+     * Create controller.
+     */
+    public Controller_Title(Controller_Tetris controller_tetris) {
+        super(controller_tetris, null, null);
+        this.view = new View_Title(this, controller_tetris.getView());
+    }
+
+    public Controller_Tetris getParentController() {
+        return (Controller_Tetris) super.getParentController();
+    }
+
+    public View_Title getView() {
+        return (View_Title) super.getView();
+    }
+
+    /**
+     * Get title as string.
+     */
+    public String getTitle()  {
+        return this.getParentController().translate("Tetris");
+    }
+
+    /**
+     * Get title logo url.
+     */
+    public String getLogoUrl() {
+        return this.getParentController().getMediaBaseUrl() + "/Media/Logo/Ai-Tetris-Logo.png";
+    }
+}
+
+
+public class Controller_Translator extends Controller_Abstract
+{
+    /**
+     * Create controller.
+     */
+    public Controller_Translator(Controller_Tetris controller_tetris) {
+        super(controller_tetris, null, null);
+        this.model = new Model_Translator();
+    }
+
+    public Model_Translator getModel() {
+        return (Model_Translator) super.getModel();
+    }
+
+    /**
+     * Translate a string.
+     */
+    public String translate(String s, String languageCode) {
+        String translation = this.getModel().getTranslations(languageCode).get(s);
+        return translation == null ? s : translation;
+    }
+}
+
+
+public class Model_Language_Collection extends Model_Collection_Abstract
+{
+    protected Model_Language[] _languages;
+
+    /**
+     * Return available languages.
+     */
+    public Model_Language[] getAllItems() {
+        if (this._languages == null) {
+            Model_Language en = new Model_Language("en", "English");
+            en.setIsDefault(true).setIconLink("/Media/Language/en/icon.png");
+
+            Model_Language ro = new Model_Language("ro", "Română");
+            ro.setIsDefault(false).setIconLink("/Media/Language/ro/icon.png");
+            this._languages = new Model_Language[]{en, ro};
+        }
+        return this._languages;
+    }
+
+    /**
+     * Get language.
+     */
+    public Model_Language getItem(String code) {
+        if (code == null) {
+            return null;
+        }
+        Model_Language[] languages = this.getAllItems();
+        for (Model_Language l : languages) {
+            if (l.getCode().equals(code)) {
+                return l;
+            }
+        }
+        return null;
+    }
+}
+
+
+public class Model_Player_Factory extends Model_Abstract
+{
+    protected static Model_Player_Factory instance;
+
+    /**
+     * Constructor is restricted.
+     */
+    protected Model_Player_Factory() {
+
+    }
+
+    /**
+     * Get singleton player factory object.
+     * @return Model_Player_Factory
+     */
+    public static Model_Player_Factory getInstance() {
+        if (Model_Player_Factory.instance == null) {
+            Model_Player_Factory.instance = new Model_Player_Factory();
+        }
+        return Model_Player_Factory.instance;
+    }
+
+    /**
+     * Create player of the given type.
+     */
+    public Model_Player createPlayer(int type, int m, int n) {
+        switch (type) {
+            case Model_Player.PLAYER_TYPE_HUMAN:
+                return new Model_PlayerHuman(null, m, n);
+            case Model_Player.PLAYER_TYPE_ROBOT_RANDOM:
+                return new Model_PlayerRobotRandom(null, m, n);
+            case Model_Player.PLAYER_TYPE_ROBOT_GENETIC:
+                Model_PlayerRobotGenetic r = new Model_PlayerRobotGenetic(null, m, n);
+                //r.setWeights(new double[]{-2, -1, -0.5, 0.5, 1, 1});
+                //r.setWeights(new double[]{0.0,-3.313235994096597,0.0,4.642230234681632,1.5168725437827648,0.0});
+                r.setWeights(new double[] {-0.7779275967758407, -1.4013782932130776, -0.7700676686917193, 0.6230435945392889, 0.9774635412697881, 2.8671072959961608});
+                r.setEvaluationFunction(new Model_PlayerRobotGenetic_EvaluationFunctionEvolved());
+                return r;
+            default:
+                return null;
+        }
+    }
+}
+
+
+public abstract class Model_PlayerRobotGenetic_EvaluationFunction extends Model_Abstract
+{
+    public abstract double evaluate(
+            double[] weights, short[][] grid,
+            int maxHeightBefore, int maxHeightAfter,
+            int noOfHolesBefore, int noOfHolesAfter,
+            int noOfBlockadesBefore, int noOfBlockadesAfter,
+            int freeSpaceBefore, int freeSpaceAfter,
+            int noOfNeighboursBefore, int noOfNeighboursAfter,
+            int noOfClearedLines
+    );
+}
+
+public class Model_PlayerRobotGenetic_EvaluationFunctionEvolved extends Model_PlayerRobotGenetic_EvaluationFunction
+{
+
+    public double evaluate(
+            double[] weights, short[][] grid,
+            int maxHeightBefore, int maxHeightAfter,
+            int noOfHolesBefore, int noOfHolesAfter,
+            int noOfBlockadesBefore, int noOfBlockadesAfter,
+            int freeSpaceBefore, int freeSpaceAfter,
+            int noOfNeighboursBefore, int noOfNeighboursAfter,
+            int noOfClearedLines) {
+        return weights[0] * maxHeightAfter / grid.length * this.evaluationLinear(maxHeightAfter - maxHeightBefore, -4, 4)
+                + weights[1] * this.evaluationLinear(noOfHolesAfter - noOfHolesBefore, -4, 3)
+                + weights[2] * this.evaluationLinear(noOfBlockadesAfter - noOfBlockadesBefore, -10, 4)
+                + weights[3] * this.evaluationLinear(freeSpaceAfter - freeSpaceBefore, -10, 10)
+                + (
+                noOfClearedLines > 0
+                        ? 0
+                        : weights[4] * this.evaluationLinear(noOfNeighboursAfter - noOfNeighboursBefore, 0, 30)
+        )
+                + weights[5] * this.evaluationLinear(noOfClearedLines, 0, 2);
+    }
+
+    public double evaluationLinear(int value, int min, int max) {
+        return ((double) (value - min)) / (max - min);
+    }
+}
+
+
+public class Model_Tetromino_Factory extends Model_Abstract
+{
+    public static final int TETROMINO_TYPE_I = 0;
+    public static final int TETROMINO_TYPE_O = 1;
+    public static final int TETROMINO_TYPE_T = 2;
+    public static final int TETROMINO_TYPE_J = 3;
+    public static final int TETROMINO_TYPE_L = 4;
+    public static final int TETROMINO_TYPE_S = 5;
+    public static final int TETROMINO_TYPE_Z = 6;
+
+    protected static Model_Tetromino_Factory instance;
+
+    /**
+     * Constructor is restricted.
+     */
+    protected Model_Tetromino_Factory() {
+
+    }
+
+    /**
+     * Get singleton player factory object.
+     * @return Model_Player_Factory
+     */
+    public static Model_Tetromino_Factory getInstance() {
+        if (Model_Tetromino_Factory.instance == null) {
+            Model_Tetromino_Factory.instance = new Model_Tetromino_Factory();
+        }
+        return Model_Tetromino_Factory.instance;
+    }
+
+    /**
+     * Create new tetromino of type given.
+     */
+    public Model_Tetromino createTetromino(int type)  {
+        Model_Tetromino t = null;
+        switch (type) {
+            case TETROMINO_TYPE_I:
+                t = new Model_Tetromino(
+                        "I",
+                        Model_Color.LIGHT_BLUE,
+                        new short[][]
+                                {
+                                        {0, 0, 1, 0},
+                                        {0, 0, 1, 0},
+                                        {0, 0, 1, 0},
+                                        {0, 0, 1, 0},
+                                }
+                );
+                break;
+            case TETROMINO_TYPE_O:
+                t = new Model_Tetromino(
+                        "O",
+                        Model_Color.YELLOW,
+                        new short[][]
+                                {
+                                        {1, 1},
+                                        {1, 1},
+                                }
+                );
+                break;
+            case TETROMINO_TYPE_T:
+                t = new Model_Tetromino(
+                        "T",
+                        Model_Color.PINK,
+                        new short[][]
+                                {
+                                        {0, 0, 0},
+                                        {0, 1, 0},
+                                        {1, 1, 1},
+                                }
+                );
+                break;
+            case TETROMINO_TYPE_J:
+                t = new Model_Tetromino(
+                        "J",
+                        Model_Color.BLUE,
+                        new short[][]
+                                {
+                                        {0, 1, 0},
+                                        {0, 1, 0},
+                                        {1, 1, 0},
+                                }
+                );
+                break;
+            case TETROMINO_TYPE_L:
+                t = new Model_Tetromino(
+                        "L",
+                        Model_Color.ORANGE,
+                        new short[][]
+                                {
+                                        {0, 1, 0},
+                                        {0, 1, 0},
+                                        {0, 1, 1},
+                                }
+                );
+                break;
+            case TETROMINO_TYPE_S:
+                t = new Model_Tetromino(
+                        "S",
+                        Model_Color.GREEN,
+                        new short[][]
+                                {
+                                        {1, 0, 0},
+                                        {1, 1, 0},
+                                        {0, 1, 0},
+                                }
+                );
+                break;
+            case TETROMINO_TYPE_Z:
+                t = new Model_Tetromino(
+                        "Z",
+                        Model_Color.RED,
+                        new short[][]
+                                {
+                                        {0, 0, 1},
+                                        {0, 1, 1},
+                                        {0, 1, 0},
+                                }
+                );
+                break;
+        }
+        return t;
+    }
+
+    /**
+     * Create all types of tetrominoes and return them into an array.
+     */
+    public Model_Tetromino[] getAllTetrominoes()  {
+        Model_Tetromino[] tetrominoes = new Model_Tetromino[7];
+        int nrt = -1;
+        for (int type : new int[]{TETROMINO_TYPE_I, TETROMINO_TYPE_O, TETROMINO_TYPE_T,
+                TETROMINO_TYPE_J, TETROMINO_TYPE_L, TETROMINO_TYPE_S, TETROMINO_TYPE_Z}) {
+            tetrominoes[++nrt] = Model_Tetromino_Factory.getInstance().createTetromino(type);
+        }
+        return tetrominoes;
+    }
+
+    /**
+     * Get number of tetrominoes types.
+     */
+    public int getNumberOfTetrominoes() {
+        return 7;
+    }
+}
+
+public interface Model
+{
+}
+
+public class Model_Abstract implements Model
+{
+}
+
+public interface Model_Collection extends Model
+{
+}
+
+public class Model_Collection_Abstract implements Model_Collection
+{
+}
+
+public class Model_Color
+{
+    public static final short NONE = 0;
+    public static final short LIGHT_BLUE = 1;
+    public static final short YELLOW = 2;
+    public static final short PINK = 3;
+    public static final short BLUE = 4;
+    public static final short ORANGE = 5;
+    public static final short GREEN = 6;
+    public static final short RED = 7;
+    public static final short WHITE = 8;
+    public static final short BLACK = 9;
+    public static final short PURPLE = 10;
+}
+
+public class Model_Exception extends Exception
+{
+
+    public Model_Exception(String message) {
+        super(message);
+    }
+}
+
+public class Model_Language extends Model_Abstract
+{
+    protected String code;
+    protected String name;
+    protected boolean isDefault_;
+    protected String iconLink;
+
+    public Model_Language(String code, String name) {
+        this.code = code;
+        this.name = name;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public Model_Language setCode(String code) {
+        this.code = code;
+        return this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Model_Language setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public boolean isDefault() {
+        return isDefault_;
+    }
+
+    public Model_Language setIsDefault(boolean isDefault) {
+        this.isDefault_ = isDefault;
+        return this;
+    }
+
+    public String getIconLink() {
+        return iconLink;
+    }
+
+    public Model_Language setIconLink(String iconLink) {
+        this.iconLink = iconLink;
+        return this;
+    }
+}
+
+public interface Model_Logger
+{
+    public boolean log(String message);
+}
+
+
+public class Model_LoggerTetris implements Model_Logger
+{
+    public static String logFile = "D:\\Personal\\Dropbox\\mywork\\Tetris\\Game\\log-in-game.txt";
+    protected BufferedWriter bwLogFile;
+
+    /**
+     * Handle fatal error.
+     */
+    protected void handleFatalError(Exception ex) {
+        ex.printStackTrace();
+        System.exit(1);
+    }
+
+    /**
+     * Handle easy error.
+     */
+    protected void handleEasyError(Exception ex) {
+        ex.printStackTrace();
+    }
+
+    /**
+     * Log message in log file.
+     */
+    public boolean log(String message) {
+        try {
+            bwLogFile.write(message);
+            bwLogFile.flush();
+            return true;
+        } catch (IOException ex) {
+            this.handleEasyError(ex);
+            return false;
+        }
+    }
+
+    /**
+     * Open log file.
+     */
+    public void openLogFile() {
+        try {
+            FileWriter fw = new FileWriter(new File(logFile));
+            bwLogFile = new BufferedWriter(fw);
+        } catch (Exception ex) {
+            this.handleEasyError(ex);
+        }
+    }
+
+    /**
+     * Close log file.
+     */
+    public void closeLogFile() {
+        try {
+            bwLogFile.close();
+        } catch (IOException ex) {
+            this.handleEasyError(ex);
+        }
+    }
+}
+
+public interface Model_Player extends Model
+{
+    public static final int PLAYER_TYPE_HUMAN = 0;
+    public static final int PLAYER_TYPE_ROBOT_RANDOM = 1;
+    public static final int PLAYER_TYPE_ROBOT_GENETIC = 2;
+
+    /**
+     * Get player name.
+     */
+    public String getName();
+
+    /**
+     * Set player name.
+     */
+    public void setName(String name);
+
+    /**
+     * Player type.
+     */
+    public int getType();
+}
+
+public abstract class Model_PlayerAbstract extends Model_Abstract implements Model_Player
+{
+    protected String name;
+    protected int m, n;         // Number of lines and number of columns for the grid the player will play in.
+    protected short[][] grid;   // The Tetris grid colors.
+
+    protected Model_Tetromino currentTetromino;
+    protected int currentTetrominoPositionLine, currentTetrominoPositionColumn;
+    protected long tetrominoLastFallingTime = 0;
+    protected long timeLastCheckForTetrominoShouldBeChanged = 0;
+
+    /**
+     * Create player.
+     */
+    public Model_PlayerAbstract(String name, int m, int n) {
+        this.name = name;
+        this.m = m;
+        this.n = n;
+        this.grid = new short[m][n];
+        for (int i = 0; i < this.grid.length; i++) {
+            for (int j = 0; j < this.grid[0].length; j++) {
+                grid[i][j] = Model_Color.NONE;
+            }
+        }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String toString() {
+        String s = "";
+        if (this.getName() != null) {
+            s += this.getName() + "\n";
+        }
+        s += "Grid:\n";
+        for (int i = 0; i < this.grid.length; i++) {
+            for (int j = 0; j < this.grid[0].length; j++) {
+                if (grid[i][j] == Model_Color.NONE) {
+                    s += ".";
+                } else {
+                    s += grid[i][j];
+                }
+            }
+            s += "\n";
+        }
+        return s;
+    }
+
+    public int getM() {
+        return m;
+    }
+
+    public void setM(int m) {
+        this.m = m;
+    }
+
+    public int getN() {
+        return n;
+    }
+
+    public void setN(int n) {
+        this.n = n;
+    }
+
+    public short[][] getGrid() {
+        return grid;
+    }
+
+    public void setGrid(short[][] grid) {
+        this.grid = grid;
+    }
+
+    public Model_Tetromino getCurrentTetromino() {
+        return currentTetromino;
+    }
+
+    public void setCurrentTetromino(Model_Tetromino currentTetromino) {
+        this.currentTetromino = currentTetromino;
+    }
+
+    public int getCurrentTetrominoPositionLine() {
+        return currentTetrominoPositionLine;
+    }
+
+    public void setCurrentTetrominoPositionLine(int currentTetrimonoPositionLine) {
+        this.currentTetrominoPositionLine = currentTetrimonoPositionLine;
+    }
+
+    public int getCurrentTetrominoPositionColumn() {
+        return currentTetrominoPositionColumn;
+    }
+
+    public void setCurrentTetrominoPositionColumn(int currentTetrominoPositionColumn) {
+        this.currentTetrominoPositionColumn = currentTetrominoPositionColumn;
+    }
+
+    public long getTetrominoLastFallingTime() {
+        return tetrominoLastFallingTime;
+    }
+
+    public void setTetrominoLastFallingTime(long tetrominoLastFallingTime) {
+        this.tetrominoLastFallingTime = tetrominoLastFallingTime;
+    }
+
+    public long getTimeLastCheckForTetrominoShouldBeChanged() {
+        return timeLastCheckForTetrominoShouldBeChanged;
+    }
+
+    public void setTimeLastCheckForTetrominoShouldBeChanged(long timeLastCheckForTetrominoShouldBeChanged) {
+        this.timeLastCheckForTetrominoShouldBeChanged = timeLastCheckForTetrominoShouldBeChanged;
+    }
+}
+
+public class Model_PlayerHuman extends Model_PlayerAbstract
+{
+    /**
+     * Create player.
+     */
+    public Model_PlayerHuman(String name, int m, int n) {
+        super(name, m, n);
+    }
+
+    public int getType() {
+        return Model_Player.PLAYER_TYPE_HUMAN;
+    }
+}
+
+public abstract class Model_PlayerRobot extends Model_PlayerAbstract
+{
+    protected int nextTetrominoPositionLine, nextTetrominoPositionColumn;
+
+    /**
+     * Create robot player.
+     */
+    public Model_PlayerRobot(String name, int m, int n) {
+        super(name, m, n);
+    }
+
+    public int getNextTetrominoPositionLine() {
+        return nextTetrominoPositionLine;
+    }
+
+    public void setNextTetrominoPositionLine(int nextTetrominoPositionLine) {
+        this.nextTetrominoPositionLine = nextTetrominoPositionLine;
+    }
+
+    public int getNextTetrominoPositionColumn() {
+        return nextTetrominoPositionColumn;
+    }
+
+    public void setNextTetrominoPositionColumn(int nextTetrominoPositionColumn) {
+        this.nextTetrominoPositionColumn = nextTetrominoPositionColumn;
+    }
+}
+
+
+public class Model_PlayerRobotGenetic extends Model_PlayerRobot
+{
+    protected double[] weights;
+    private Model_PlayerRobotGenetic_EvaluationFunction evaluationFunction;
+    /**
+     * Create genetic robot player.
+     */
+    public Model_PlayerRobotGenetic(String name, int m, int n) {
+        super(name, m, n);
+    }
+
+    public int getType() {
+        return Model_Player.PLAYER_TYPE_ROBOT_GENETIC;
+    }
+
+    /**
+     * Set weights.
+     */
+    public void setWeights(double[] weights) {
+        this.weights = weights;
+    }
+
+    /**
+     * Get weight.
+     */
+    public double getWeight(int i) {
+        return this.weights[i];
+    }
+
+    public double[] getWeights() {
+        return weights;
+    }
+
+    public Model_PlayerRobotGenetic_EvaluationFunction getEvaluationFunction() {
+        return evaluationFunction;
+    }
+
+    public void setEvaluationFunction(Model_PlayerRobotGenetic_EvaluationFunction evaluationFunction) {
+        this.evaluationFunction = evaluationFunction;
+    }
+}
+
+public class Model_PlayerRobotRandom extends Model_PlayerRobot
+{
+    /**
+     * Create random robot player.
+     */
+    public Model_PlayerRobotRandom(String name, int m, int n) {
+        super(name, m, n);
+    }
+
+    public int getType() {
+        return Model_Player.PLAYER_TYPE_ROBOT_RANDOM;
+    }
+}
+
+
+public class Model_Tetris extends Model_Abstract
+{
+    protected int numberOfPlayers;
+    protected Model_Player[] players;
+    protected Model_Player_Factory playersFactory;
+    protected Model_Tetromino_Factory tetrominosFactory;
+
+    /**
+     * Create tetris model.
+     * players is an array containing the types of the players (human or robot)
+     */
+    public Model_Tetris(int[] players, int numberOfLinesTetrisField, int numberOfColumnsTetrisField) {
+        this.tetrominosFactory = Model_Tetromino_Factory.getInstance();
+        this.createPlayers(players, numberOfLinesTetrisField, numberOfColumnsTetrisField);
+    }
+
+    /**
+     * Create the players.
+     */
+    protected void createPlayers(int[] players, int numberOfLines, int numberOfColumns) {
+        this.playersFactory = Model_Player_Factory.getInstance();
+        this.numberOfPlayers = players.length;
+        this.players = new Model_Player[this.numberOfPlayers];
+        for (int i = 0; i < this.numberOfPlayers; i++) {
+            this.players[i] = playersFactory.createPlayer(players[i], numberOfLines, numberOfColumns);
+        }
+    }
+
+    /**
+     * Get players.
+     * @return Model_Player[]
+     */
+    public Model_Player[] getPlayers() {
+        return this.players;
+    }
+
+    public String toString() {
+        String s = "";
+        s += "Players:\n";
+        for (Model_Player p : this.getPlayers()) {
+            s += "» " + p.toString().replace("\n", "\n\t") + "\n";
+        }
+        return s;
+    }
+
+    /**
+     * Get number of tetrominos types.
+     */
+    public int getNumberOfTetrominos() {
+        return this.tetrominosFactory.getNumberOfTetrominoes();
+    }
+
+    /**
+     * Get factory.
+     */
+    public Model_Tetromino_Factory getTetrominosFactory() {
+        return tetrominosFactory;
+    }
+
+    /**
+     * Get number of players.
+     */
+    public int getNumberOfPlayers() {
+        return numberOfPlayers;
+    }
+}
+
+public class Model_Tetromino extends Model_Abstract
+{
+    protected String code;
+    protected short colorT;
+    protected short[][][] pieces; // An array with 4 matrix's. Each matrix is a position of the tetromino (0 degrees, 90 degrees, 180 degrees and 270 degrees).
+    protected short currentRotationNumber = 0;
+    protected boolean[] rotationsDuplicated;
+    protected int maxHeight;
+
+    /**
+     * Create tetromino.
+     */
+    public Model_Tetromino(String code, short colorT, short pieces[][])  {
+
+        // Matrix should be square.
+        for (short[] piece : pieces) {
+            if (piece.length != pieces.length) {
+                throw new Model_Exception("");
+            }
+        }
+
+        this.code = code;
+        this.colorT = colorT;
+
+        short[][] pieces90 = this.rotateMatrixToRight90Degrees(pieces);
+        short[][] pieces180 = this.rotateMatrixToRight90Degrees(pieces90);
+        short[][] pieces270 = this.rotateMatrixToRight90Degrees(pieces180);
+        this.pieces = new short[4][][];
+        this.pieces[0] = this.removeZerosFromMargins(pieces);
+        this.pieces[1] = this.removeZerosFromMargins(pieces90);
+        this.pieces[2] = this.removeZerosFromMargins(pieces180);
+        this.pieces[3] = this.removeZerosFromMargins(pieces270);
+
+        // Check if rotations are duplicated.
+        this.rotationsDuplicated = new boolean[4];
+        this.maxHeight = 0;
+        for (int i = 0; i < 4; i++) {
+            if (this.pieces[i].length > this.maxHeight) {
+                this.maxHeight = this.pieces[i].length;
+            }
+            int duplicatedTimes = 0;
+            for (int j = 0; j < i; j++) {
+                if (i != j && this.matrixAreTheSame(this.pieces[i], this.pieces[j])) {
+                    duplicatedTimes++;
+                    break;
+                }
+            }
+            this.rotationsDuplicated[i] = duplicatedTimes != 0;
+        }
+
+        this.currentRotationNumber = 0;
+    }
+
+    protected boolean matrixAreTheSame(short[][] m1, short[][] m2) {
+        if (m1.length != m2.length) {
+            return false;
+        }
+        for (int i = 0; i < m1.length; i++) {
+            if (m1[i].length != m2[i].length) {
+                return false;
+            }
+            for (int j = 0; j < m1[i].length; j++) {
+                if (m1[i][j] != m2[i][j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean currentRotationIsDuplicated() {
+        return this.rotationsDuplicated[this.currentRotationNumber];
+    }
+
+    /**
+     * Copy tetromino.
+     */
+    public Model_Tetromino(Model_Tetromino tetromino) {
+        this.code = tetromino.code;
+        this.colorT = tetromino.colorT;
+        this.currentRotationNumber = tetromino.currentRotationNumber;
+        this.pieces = new short[4][][];
+        this.rotationsDuplicated = new boolean[4];
+        for (int k = 0; k < 4; k++) {
+            this.rotationsDuplicated[k] = tetromino.rotationsDuplicated[k];
+            this.pieces[k] = new short[tetromino.pieces[k].length][];
+            for (int i = 0; i < tetromino.pieces[k].length; i++) {
+                this.pieces[k][i] = new short[tetromino.pieces[k][i].length];
+                for (int j = 0; j < tetromino.pieces[k][i].length; j++) {
+                    this.pieces[k][i][j] = tetromino.pieces[k][i][j];
+                }
+            }
+        }
+    }
+
+    /**
+     * Rotate the squared matrix pieces by 90 degrees.
+     */
+    protected short[][] rotateMatrixToRight90Degrees(short[][] pieces) {
+        short[][] newPieces = new short[pieces.length][pieces[0].length];
+        for (int i = 0; i < pieces.length; i++) {
+            for (int j = 0; j < pieces[i].length; j++) {
+                newPieces[i][j] = pieces[j][pieces.length - 1 - i];
+            }
+        }
+        return newPieces;
+    }
+
+    /**
+     * Remove zeros from margins. The matrix is supposed to have the same number of columns per each line.
+     */
+    private short[][] removeZerosFromMargins(short[][] matrix) {
+        int startTopLine = 0;
+        // Count how many lines at the top contain only zeros.
+        for (startTopLine = 0; startTopLine < matrix.length; startTopLine++) {
+            boolean isBadLine = true;
+            for (int j = 0; j < matrix[startTopLine].length; j++) {
+                if (matrix[startTopLine][j] == 1) {
+                    isBadLine = false;
+                    break;
+                }
+            }
+            if (!isBadLine) {
+                break;
+            }
+        }
+
+        int endTopLine = 0;
+        // Count how many lines at the bottom contain only zeros.
+        for (endTopLine = matrix.length - 1; endTopLine >= 0; endTopLine--) {
+            boolean isBadLine = true;
+            for (int j = 0; j < matrix[endTopLine].length; j++) {
+                if (matrix[endTopLine][j] == 1) {
+                    isBadLine = false;
+                    break;
+                }
+            }
+            if (!isBadLine) {
+                break;
+            }
+        }
+
+        int startLeftColumn = 0;
+        // Count how many lines at the left contain only zeros.
+        for (startLeftColumn = 0; startLeftColumn < matrix.length; startLeftColumn++) {
+            boolean isBadColumn = true;
+            for (int i = 0; i < matrix.length; i++) {
+                if (matrix[i][startLeftColumn] == 1) {
+                    isBadColumn = false;
+                    break;
+                }
+            }
+            if (!isBadColumn) {
+                break;
+            }
+        }
+
+        int endRightColumn = 0;
+        // Count how many lines at the left contain only zeros.
+        for (endRightColumn = matrix.length - 1; endRightColumn >= 0; endRightColumn--) {
+            boolean isBadColumn = true;
+            for (int i = 0; i < matrix.length; i++) {
+                if (matrix[i][endRightColumn] == 1) {
+                    isBadColumn = false;
+                    break;
+                }
+            }
+            if (!isBadColumn) {
+                break;
+            }
+        }
+
+        int goodLines = endTopLine - startTopLine + 1;
+        int goodColumns = endRightColumn - startLeftColumn + 1;
+
+        short[][] newM = new short[goodLines][goodColumns];
+        for (int i = startTopLine; i <= endTopLine; i++) {
+            for (int j = startLeftColumn; j <= endRightColumn; j++) {
+                newM[i - startTopLine][j - startLeftColumn] = matrix[i][j];
+            }
+        }
+
+        return newM;
+    }
+
+    public String toString() {
+        String s = "";
+        s += this.code + "\n";
+        int degrees = 0;
+        for (short[][] p : this.pieces) {
+            s += degrees + ":" + (this.rotationsDuplicated[degrees / 90] ? "(duplicated)" : "") + "\n";
+            for (int i = 0; i < p.length; i++) {
+                for (int j = 0; j < p[0].length; j++) {
+                    s += p[i][j] + " ";
+                }
+                s += "\n";
+            }
+            degrees += 90;
+        }
+        return s;
+    }
+
+    public String toStringOnlyCurrentPosition() {
+        String s = "";
+        s += this.code + "\n";
+        short[][] p = this.pieces[this.currentRotationNumber];
+        for (int i = 0; i < p.length; i++) {
+            for (int j = 0; j < p[0].length; j++) {
+                s += p[i][j] + " ";
+            }
+            s += "\n";
+        }
+        return s;
+    }
+
+    public boolean equals(Object obj) {
+        Model_Tetromino t = (Model_Tetromino) obj;
+        return t != null && t.code.equals(this.code);
+    }
+
+    /**
+     * Get current matrix.
+     */
+    public short[][] getCurrentRotation() {
+        return this.pieces[this.currentRotationNumber];
+    }
+
+    public short getColor() {
+        return this.colorT;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    /**
+     * Rotate tetromino to right.
+     */
+    public void rotateToRight() {
+        this.currentRotationNumber = (short) ((this.currentRotationNumber + 1) % 4);
+    }
+
+    /**
+     * Rotate tetromino to left.
+     */
+    public void rotateToLeft() {
+        this.currentRotationNumber++;
+        this.currentRotationNumber %= 4;
+    }
+
+    public short getCurrentRotationNumber() {
+        return currentRotationNumber;
+    }
+
+    public void setCurrentRotationNumber(short currentRotationNumber) {
+        this.currentRotationNumber = currentRotationNumber;
+    }
+
+    public int getMaxHeightOfAnyRotationOfThisTetromino() {
+        return maxHeight;
+    }
+}
+
+
+public class Model_Translator extends Model_Abstract
+{
+    protected HashMap<String, HashMap> translations;
+
+    /**
+     * Get translations.
+     */
+    public HashMap<String, String> getTranslations(String code) {
+        if (this.translations == null) {
+            this.translations = new HashMap<String, HashMap>();
+            HashMap<String, String> roHashMap = new HashMap<String, String>();
+            HashMap<String, String> enHashMap = new HashMap<String, String>();
+
+            enHashMap.put("Tetris", "Tetris Game");
+            enHashMap.put("Language was selected.", "English language was selected.");
+            enHashMap.put("Next tetromino:", "Next:");
+            enHashMap.put("Legend", "Keys to use");
+            enHashMap.put("UP-arrow", "UP");
+            enHashMap.put("DOWN-arrow", "DOWN");
+            enHashMap.put("LEFT-arrow", "LEFT");
+            enHashMap.put("RIGHT-arrow", "RIGHT");
+
+            roHashMap.put("Tetris", "Tetris");
+            roHashMap.put("Go back", "Înapoi");
+            roHashMap.put("No current language set.", "Eroare la selectarea limbii.");
+            roHashMap.put("An unexpected error has occurred.", "Eroare.");
+            roHashMap.put("The game will continue, but its behaviour may not be fully stable.", "Aplicatia va continua, dar s-ar putea sa fie instabila.");
+            roHashMap.put("Title image not found.", "Logo-ul Tetris nu a fost gasit.");
+            roHashMap.put("Language image not found.", "Eroare la incarcarea imaginilor in aplicatie.");
+            roHashMap.put("Language was selected.", "Limba română a fost selectată.");
+            roHashMap.put("Score", "Scor");
+            roHashMap.put("Legend", "Legenda");
+            roHashMap.put("Next tetromino:", "Urmează:");
+            roHashMap.put("UP-arrow", "UP");
+            roHashMap.put("DOWN-arrow", "DOWN");
+            roHashMap.put("LEFT-arrow", "LEFT");
+            roHashMap.put("RIGHT-arrow", "RIGHT");
+            roHashMap.put("SPACE", "SPACE");
+            roHashMap.put("move to right", "mută la dreapta");
+            roHashMap.put("move to left", "mută la stânga");
+            roHashMap.put("rotate to left", "rotește la stânga");
+            roHashMap.put("fall down one level", "în jos un nivel");
+            roHashMap.put("fall", "în jos");
+            roHashMap.put("Game over", "Sfârșit joc");
+            roHashMap.put("You won", "Ai câștigat");
+            roHashMap.put("You lost", "Ai pierdut");
+            roHashMap.put("Human player", "Jucător");
+            roHashMap.put("Robot Random", "Robot Random");
+            roHashMap.put("Press any key to start", "Apasă orice tastă");
+            roHashMap.put("Searching move...", "Caută mutare...");
+            roHashMap.put("Robot Genetic cannot play on a grid larger than 30x30.", "Un robot genetic nu poate sa joace un joc de Tetris > 30x30.");
+            roHashMap.put("Grid cannot be smaller than 10x5 or higher than ", "Nu se poate juca AI Tetris < 10 x 5 sau > ");
+            roHashMap.put("Show Top Players", "Top jucători");
+
+            this.translations.put("ro", roHashMap);
+            this.translations.put("en", enHashMap);
+        }
+        return this.translations.get(code);
+    }
+}
+
+
+public abstract class View_Player_Grid extends View_Abstract
+{
+    public float GRID_START_X = -1;
+    public float GRID_START_Y = -1;
+    public float GRID_WIDTH = -1;
+    public static float MIN_WIDTH_TO_LEAVE_BLANK = 100;
+    public float GRID_HEIGHT = -1;
+
+    public static final float GRID_PADDING_LEFT = 10;
+    public static final float GRID_PADDING_RIGHT = 10;
+    public static final float GRID_PADDING_TOP = 10;
+    public static final float GRID_PADDING_DOWN = 10;
+    public float FILL_GRID_RED = 200;
+    public float FILL_GRID_GREEN = 200;
+    public float FILL_GRID_BLUE = 200;
+
+    public float MESSAGE_TEXT_X = -1;
+    public float MESSAGE_TEXT_Y = -1;
+    public float MESSAGE_TEXT_SIZE = 20;
+    public float MESSAGE_TEXT_RED = 0;
+    public float MESSAGE_TEXT_GREEN = 0;
+    public float MESSAGE_TEXT_BLUE = 0;
+    public float GAME_OVER_FILL_ALPHA = 128;
+
+    public int FILL_RED_PRESS_ANY_KEY_TEXT = 0;
+    public int FILL_GREEN_PRESS_ANY_KEY_TEXT = 0;
+    public int FILL_BLUE_PRESS_ANY_KEY_TEXT = 0;
+    public int TEXT_SIZE_PRESS_ANY_KEY_TEXT = 20;
+
+    public static boolean DRAW_YOUR_OWN_BLOCKS = false;
+
+    /**
+     * Create controller.
+     */
+    public View_Player_Grid(Controller_Player_Grid controller_player_grid, View_Player view) {
+        super(controller_player_grid, view);
+    }
+
+    public Controller_Player_Grid getController() {
+        return (Controller_Player_Grid) super.getController();
+    }
+
+    public View_Player getParentView() {
+        return (View_Player) super.getParentView();
+    }
+
+    public void setup()  {
+        GRID_START_X = this.getParentView().PLAYER_START_X + GRID_PADDING_LEFT;
+        GRID_START_Y = this.getParentView().PLAYER_START_Y + GRID_PADDING_TOP;
+        GRID_WIDTH = this.getParentView().SIZE_MATRIX_ELEMENT_X * Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID;
+        GRID_HEIGHT = this.getParentView().SIZE_MATRIX_ELEMENT_Y * Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID;
+
+        MESSAGE_TEXT_X = GRID_START_X + GRID_WIDTH / 2;
+        MESSAGE_TEXT_Y = GRID_START_Y + GRID_HEIGHT / 2;
+
+        int dyob = Controller_Tetris.getParameterByName("dyob");
+        if (dyob) {
+            DRAW_YOUR_OWN_BLOCKS = true;//Controller_PlayerHuman.counter == 0;
+        }
+    }
+
+    public void draw()  {
+        // Rectangle.
+        this.getParentView().getParentView().useDefaultStroke();
+        fill(FILL_GRID_RED, FILL_GRID_GREEN, FILL_GRID_BLUE);
+        rect(
+                GRID_START_X - this.getParentView().TETROMINO_STROKE_WEIGHT,
+                GRID_START_Y - this.getParentView().TETROMINO_STROKE_WEIGHT,
+                GRID_WIDTH + this.getParentView().TETROMINO_STROKE_WEIGHT,
+                GRID_HEIGHT + this.getParentView().TETROMINO_STROKE_WEIGHT);
+
+        if (this.getController().getParentController().getParentController().isGameStarted()) {
+            // Check what happens.
+            if (!this.getController().getParentController().isGameOver()) {
+                this.getController().checkCurrentTetromino();
+            }
+
+            if (!this.getController().getParentController().isGameOver()) {
+                // Update grid.
+                int clearedLines = this.getController().updateCurrentGrid();
+
+                // Update score.
+                this.getController().getParentController().updateScore(clearedLines);
+                this.getController().getParentController().playerUpdatedGrid(clearedLines);
+            }
+        }
+
+        // Grid.
+        this.getParentView().tetrominoMode(View_Player.TETROMINO_MODE_RIGHT, View_Player.TETROMINO_MODE_TOP);
+        this.getController().addShadowInTheGridForCurrentTetromino();
+        this.getController().addCurrentTetrominoToCurentGrid();
+        this.getParentView().grid(this.getController().getModel().getGrid(), GRID_START_X, GRID_START_Y, null);
+        this.getController().removeCurrentTetrominoFromGrid();
+        this.getController().removeShadowFromTheGrid();
+
+        if (!this.getController().getParentController().getParentController().isGameStarted()) {
+            // Wait to start message.
+            textAlign(CENTER, CENTER);
+            fill(FILL_RED_PRESS_ANY_KEY_TEXT, FILL_GREEN_PRESS_ANY_KEY_TEXT, FILL_BLUE_PRESS_ANY_KEY_TEXT);
+            textSize(TEXT_SIZE_PRESS_ANY_KEY_TEXT);
+            text(
+                    Controller_Tetris.translate("Press any key to start"),
+                    GRID_START_X + GRID_WIDTH / 2,
+                    GRID_START_Y + GRID_HEIGHT / 2);
+        }
+
+        if (this.getController().getParentController().isGameOver()
+                && this.getController().getParentController().getParentController().isGameStarted()) {
+            // Prepare game over message.
+            textSize(MESSAGE_TEXT_SIZE);
+            String message = this.getController().getParentController().getFinalPlace() == 1
+                    ? "You won"
+                    : "You lost";
+            message = Controller_Tetris.translate("Game over")
+                    + (this.getController().getParentController().getParentController().getNumberOfPlayers() > 1
+                    ? "\n" + Controller_Tetris.translate(message)
+                    : "");
+            this.messageOnGrid(message);
+        }
+    }
+
+    public Object doAction(int action)  {
+        if (!this.getController().getParentController().isGameOver()) {
+            return super.doAction(action);
+        } else {
+            // Only allow drawing.
+            return action == ACTION_DRAW ? super.doAction(action) : null;
+        }
+    }
+
+    public void messageOnGrid(String message) {
+        // Message rectangle.
+        noStroke();
+        fill(FILL_GRID_RED, FILL_GRID_GREEN, FILL_GRID_BLUE, GAME_OVER_FILL_ALPHA);
+        rect(
+                MESSAGE_TEXT_X - textWidth(message) / 2,
+                MESSAGE_TEXT_Y - MESSAGE_TEXT_SIZE,
+                textWidth(message),
+                MESSAGE_TEXT_SIZE * 3);
+
+        // Message.
+        textAlign(CENTER, CENTER);
+        fill(MESSAGE_TEXT_RED, MESSAGE_TEXT_GREEN, MESSAGE_TEXT_BLUE);
+        text(
+                message,
+                MESSAGE_TEXT_X,
+                MESSAGE_TEXT_Y
+        );
+    }
+
+    public void mouseDragged()  {
+        this.fillCells();
+        super.mouseDragged();
+    }
+
+    public void mousePressed()  {
+        this.fillCells();
+        super.mousePressed();
+    }
+
+    protected void fillCells() {
+        if (DRAW_YOUR_OWN_BLOCKS) {
+            int mX = mouseX;
+            int mY = mouseY;
+            if (mX >= GRID_START_X
+                    && mX <= GRID_START_X + GRID_WIDTH
+                    && mY >= GRID_START_Y
+                    && mY <= GRID_START_Y + GRID_HEIGHT
+                    ) {
+                int c = (int) Math.floor((mX - GRID_START_X) / this.getParentView().SIZE_MATRIX_ELEMENT_X);
+                int l = (int) Math.floor((mY - GRID_START_Y) / this.getParentView().SIZE_MATRIX_ELEMENT_Y);
+                short[][] grid = this.getController().getModel().getGrid();
+                if (l >= 0 && l < grid.length && c >= 0 && c < grid[l].length) {
+                    this.getController().getModel().getGrid()[l][c] = Model_Color.PURPLE;
+                }
+            }
+        }
+    }
+}
+
+
+public class View_Player_Info extends View_Abstract
+{
+    public float INFO_START_X = -1;
+    public float INFO_START_Y = -1;
+    public float INFO_WIDTH = -1;
+    public float INFO_HEIGHT = -1;
+
+    public static final float INFO_PADDING_LEFT = 0;
+    public static final float INFO_PADDING_RIGHT = 0;
+    public static final float INFO_PADDING_TOP = 10;
+
+    public float FILL_INFO_RED = -1;
+    public float FILL_INFO_GREEN = -1;
+    public float FILL_INFO_BLUE = -1;
+    public float COLOR_INFO_RED = 0;
+    public float COLOR_INFO_GREEN = 0;
+    public float COLOR_INFO_BLUE = 0;
+    public float INFO_TEXT_SIZE = 13;
+
+    /**
+     * Create controller.
+     */
+    public View_Player_Info(Controller_Player_Info controller_player_info, View_Player view) {
+        super(controller_player_info, view);
+    }
+
+    public Controller_Player_Info getController() {
+        return (Controller_Player_Info) super.getController();
+    }
+
+    public View_Player getParentView() {
+        return (View_Player) super.getParentView();
+    }
+
+    public void setup()  {
+        INFO_START_X = this.getController().getParentController().getGridController().getView().GRID_START_X
+                + this.getController().getParentController().getGridController().getView().GRID_WIDTH
+                + View_Player_Grid.GRID_PADDING_RIGHT
+                + INFO_PADDING_LEFT;
+        INFO_HEIGHT = 50;
+        INFO_START_Y = INFO_PADDING_TOP
+                + this.getController().getParentController().getView().PLAYER_START_Y
+                + this.getController().getParentController().getView().PLAYER_HEIGHT
+                - this.getController().getParentController().getView().PLAYER_PADDING_DOWN
+                - INFO_HEIGHT;
+        INFO_WIDTH = Math.max(this.getParentView().SIZE_MATRIX_ELEMENT_X * 4, View_Player_Grid.MIN_WIDTH_TO_LEAVE_BLANK);
+
+
+        FILL_INFO_RED = this.getController().getParentController().getGridController().getView().FILL_GRID_RED;
+        FILL_INFO_GREEN = this.getController().getParentController().getGridController().getView().FILL_GRID_GREEN;
+        FILL_INFO_BLUE = this.getController().getParentController().getGridController().getView().FILL_GRID_BLUE;
+    }
+
+    public void draw()  {
+        // Fill rectangle.
+        this.getParentView().getParentView().useDefaultStroke();
+        fill(FILL_INFO_RED, FILL_INFO_GREEN, FILL_INFO_BLUE);
+        rect(INFO_START_X, INFO_START_Y, INFO_WIDTH, INFO_HEIGHT);
+
+        // Info.
+        textSize(INFO_TEXT_SIZE);
+        textAlign(CENTER, CENTER);
+        fill(COLOR_INFO_RED, COLOR_INFO_GREEN, COLOR_INFO_BLUE);
+        this.getController().getParentController().getParentController();
+        text(
+                this.getController().getInfo(),
+                INFO_START_X, INFO_START_Y, INFO_WIDTH, INFO_HEIGHT
+        );
+    }
+}
+
+
+public class View_Player_Next extends View_Abstract
+{
+    public float NEXT_START_X = -1;
+    public float NEXT_START_Y = -1;
+    public float NEXT_WIDTH = -1;
+    public float NEXT_HEIGHT = -1;
+
+    public static final float NEXT_PADDING_LEFT = 0;
+    public static final float NEXT_PADDING_RIGHT = 0;
+    public static final float NEXT_PADDING_TOP = 10;
+
+    public float FILL_NEXT_RED = -1;
+    public float FILL_NEXT_GREEN = -1;
+    public float FILL_NEXT_BLUE = -1;
+
+    public float COLOR_NEXT_RED = 0;
+    public float COLOR_NEXT_GREEN = 0;
+    public float COLOR_NEXT_BLUE = 0;
+
+    public float NEXT_TEXT_SIZE = 15;
+
+    /**
+     * Create controller.
+     */
+    public View_Player_Next(Controller_Player_Next controller_player_Next, View_Player view) {
+        super(controller_player_Next, view);
+    }
+
+    public View_Player getParentView() {
+        return (View_Player) super.getParentView();
+    }
+
+    public Controller_Player_Next getController() {
+        return (Controller_Player_Next) super.getController();
+    }
+
+    public void setup()  {
+        NEXT_START_X = this.getController().getParentController().getGridController().getView().GRID_START_X
+                + this.getController().getParentController().getGridController().getView().GRID_WIDTH
+                + View_Player_Grid.GRID_PADDING_RIGHT
+                + NEXT_PADDING_LEFT;
+        NEXT_START_Y = this.getParentView().PLAYER_START_Y + NEXT_PADDING_TOP;
+        NEXT_WIDTH = Math.max(this.getParentView().SIZE_MATRIX_ELEMENT_X * 4, View_Player_Grid.MIN_WIDTH_TO_LEAVE_BLANK);
+        NEXT_HEIGHT = this.getParentView().SIZE_MATRIX_ELEMENT_Y * 4
+                + NEXT_TEXT_SIZE + 10;
+
+        FILL_NEXT_RED = this.getController().getParentController().getGridController().getView().FILL_GRID_RED;
+        FILL_NEXT_GREEN = this.getController().getParentController().getGridController().getView().FILL_GRID_GREEN;
+        FILL_NEXT_BLUE = this.getController().getParentController().getGridController().getView().FILL_GRID_BLUE;
+    }
+
+    public void draw()  {
+        // Fill rectangle.
+        this.getParentView().getParentView().useDefaultStroke();
+        fill(FILL_NEXT_RED, FILL_NEXT_GREEN, FILL_NEXT_BLUE);
+        rect(NEXT_START_X, NEXT_START_Y, NEXT_WIDTH, NEXT_HEIGHT);
+
+        // Next tetromino label.
+        textSize(NEXT_TEXT_SIZE);
+        textAlign(CENTER, TOP);
+        fill(COLOR_NEXT_RED, COLOR_NEXT_GREEN, COLOR_NEXT_BLUE);
+        text(
+                Controller_Tetris.translate("Next tetromino:"),
+                NEXT_START_X + 0.5f * NEXT_WIDTH,
+                NEXT_START_Y + 0.0f * NEXT_HEIGHT);
+
+        // Next tetromino.
+        if (this.getController().getNextTetromino() != null) {
+            this.getParentView().tetrominoMode(View_Player.TETROMINO_MODE_CENTER, View_Player.TETROMINO_MODE_MIDDLE);
+            this.getParentView().tetromino(this.getController().getNextTetromino(),
+                    NEXT_START_X + 0.5f * NEXT_WIDTH,
+                    NEXT_START_Y + 0.5f * (NEXT_HEIGHT - NEXT_TEXT_SIZE) + NEXT_TEXT_SIZE);
+        }
+    }
+}
+
+
+public class View_Player_Score extends View_Abstract
+{
+    public float SCORE_START_X = -1;
+    public float SCORE_START_Y = -1;
+    public float SCORE_WIDTH = -1;
+    public float SCORE_HEIGHT = -1;
+
+    public static final float SCORE_PADDING_LEFT = 0;
+    public static final float SCORE_PADDING_RIGHT = 0;
+    public static final float SCORE_PADDING_TOP = 10;
+
+    public float FILL_SCORE_RED = -1;
+    public float FILL_SCORE_GREEN = -1;
+    public float FILL_SCORE_BLUE = -1;
+    public float COLOR_SCORE_RED = 0;
+    public float COLOR_SCORE_GREEN = 0;
+    public float COLOR_SCORE_BLUE = 0;
+    public float SCORE_TEXT_SIZE = 15;
+
+    /**
+     * Create controller.
+     */
+    public View_Player_Score(Controller_Player_Score controller_player_Score, View_Player view) {
+        super(controller_player_Score, view);
+    }
+
+    public Controller_Player_Score getController() {
+        return (Controller_Player_Score) super.getController();
+    }
+
+    public View_Player getParentView() {
+        return (View_Player) super.getParentView();
+    }
+
+    public void setup()  {
+        SCORE_START_X = this.getController().getParentController().getGridController().getView().GRID_START_X
+                + this.getController().getParentController().getGridController().getView().GRID_WIDTH
+                + View_Player_Grid.GRID_PADDING_RIGHT
+                + SCORE_PADDING_LEFT;
+        SCORE_START_Y = this.getParentView().PLAYER_START_Y + SCORE_PADDING_TOP
+                + this.getController().getParentController().getNextController().getView().NEXT_HEIGHT
+                + View_Player_Next.NEXT_PADDING_TOP;
+        SCORE_WIDTH = Math.max(this.getParentView().SIZE_MATRIX_ELEMENT_X * 4, View_Player_Grid.MIN_WIDTH_TO_LEAVE_BLANK);
+        SCORE_HEIGHT = 50;
+
+        FILL_SCORE_RED = this.getController().getParentController().getGridController().getView().FILL_GRID_RED;
+        FILL_SCORE_GREEN = this.getController().getParentController().getGridController().getView().FILL_GRID_GREEN;
+        FILL_SCORE_BLUE = this.getController().getParentController().getGridController().getView().FILL_GRID_BLUE;
+    }
+
+    public void draw()  {
+        // Fill rectangle.
+        this.getParentView().getParentView().useDefaultStroke();
+        fill(FILL_SCORE_RED, FILL_SCORE_GREEN, FILL_SCORE_BLUE);
+        rect(SCORE_START_X, SCORE_START_Y, SCORE_WIDTH, SCORE_HEIGHT);
+
+        // Score label.
+        textSize(SCORE_TEXT_SIZE);
+        textAlign(CENTER, BOTTOM);
+        fill(COLOR_SCORE_RED, COLOR_SCORE_GREEN, COLOR_SCORE_BLUE);
+        text(
+                this.getController().getParentController().getParentController().translate("Score"),
+                SCORE_START_X + 0.5f * SCORE_WIDTH,
+                SCORE_START_Y + 0.5f * SCORE_HEIGHT);
+        // Score.
+        text(
+                this.getController().getScore(),
+                SCORE_START_X + 0.5f * SCORE_WIDTH,
+                SCORE_START_Y + 0.5f * SCORE_HEIGHT + SCORE_TEXT_SIZE + 2);
+    }
+}
+
+
+public class View_PlayerHuman_Grid extends View_Player_Grid
+{
+    public static int COUNTER_HUMAN_PLAYERS = 0;
+
+    public int MOVE_TETROMINO_KEY_LEFT = -1;
+    public int MOVE_TETROMINO_KEY_RIGHT = -1;
+    public int MOVE_TETROMINO_KEY_DOWN = -1;
+    public int MOVE_TETROMINO_KEY_FALL = -1;
+    public int MOVE_TETROMINO_KEY_ROTATE_LEFT = -1;
+    public int MOVE_TETROMINO_KEY_ROTATE_RIGHT = -1;
+
+    /**
+     * Create controller.
+     */
+    public View_PlayerHuman_Grid(Controller_PlayerHuman_Grid controller_player_grid, View_PlayerHuman view) {
+        super(controller_player_grid, view);
+    }
+
+    public View_PlayerHuman getParentView() {
+        return (View_PlayerHuman) super.getParentView();
+    }
+
+    public void setup()  {
+        COUNTER_HUMAN_PLAYERS++;
+
+        super.setup();
+
+        int n = this.getController().getParentController().getParentController().getNumberOfPlayers(Model_Player.PLAYER_TYPE_HUMAN);
+        switch (n) {
+            case 1:
+                MOVE_TETROMINO_KEY_LEFT = LEFT;
+                MOVE_TETROMINO_KEY_RIGHT = RIGHT;
+                MOVE_TETROMINO_KEY_DOWN = DOWN;
+                MOVE_TETROMINO_KEY_FALL = 32;
+                MOVE_TETROMINO_KEY_ROTATE_LEFT = UP;
+                MOVE_TETROMINO_KEY_ROTATE_RIGHT = -1;
+                break;
+            case 2:
+                switch (COUNTER_HUMAN_PLAYERS) {
+                    case 2:
+                        MOVE_TETROMINO_KEY_LEFT = LEFT;
+                        MOVE_TETROMINO_KEY_RIGHT = RIGHT;
+                        MOVE_TETROMINO_KEY_DOWN = DOWN;
+                        MOVE_TETROMINO_KEY_FALL = (int) 'L';
+                        MOVE_TETROMINO_KEY_ROTATE_LEFT = UP;
+                        MOVE_TETROMINO_KEY_ROTATE_RIGHT = -1;
+                        break;
+                    case 1:
+                        MOVE_TETROMINO_KEY_LEFT = (int) 'A';
+                        MOVE_TETROMINO_KEY_RIGHT = (int) 'D';
+                        MOVE_TETROMINO_KEY_DOWN = (int) 'S';
+                        MOVE_TETROMINO_KEY_FALL = (int) '1';
+                        MOVE_TETROMINO_KEY_ROTATE_LEFT = (int) 'W';
+                        MOVE_TETROMINO_KEY_ROTATE_RIGHT = -1;
+                        break;
+                }
+                break;
+        }
+    }
+
+    public void keyPressed()  {
+        int key = keyCode;
+        if (key == MOVE_TETROMINO_KEY_RIGHT) {
+            this.getController().moveCurrentTetrominoToRight();
+        }
+        if (key == MOVE_TETROMINO_KEY_LEFT) {
+            this.getController().moveCurrentTetrominoToLeft();
+        }
+        if (key == MOVE_TETROMINO_KEY_DOWN) {
+            this.getController().moveCurrentTetrominoDownOneLevel();
+        }
+        if (key == MOVE_TETROMINO_KEY_FALL) {
+            this.getController().fallCurrentTetromino();
+        }
+        if (key == MOVE_TETROMINO_KEY_ROTATE_RIGHT) {
+            this.getController().rotateTetrominoToRight();
+        }
+        if (key == MOVE_TETROMINO_KEY_ROTATE_LEFT) {
+            this.getController().rotateTetrominoToLeft();
+        }
+    }
+}
+
+
+public class View_PlayerHuman_Legend extends View_Abstract
+{
+    public float LEGEND_START_X = -1;
+    public float LEGEND_START_Y = -1;
+    public float LEGEND_WIDTH = -1;
+    public float LEGEND_HEIGHT = -1;
+
+    public static final float LEGEND_PADDING_LEFT = 0;
+    public static final float LEGEND_PADDING_RIGHT = 0;
+    public static final float LEGEND_PADDING_TOP = 10;
+
+    public float FILL_LEGEND_RED = -1;
+    public float FILL_LEGEND_GREEN = -1;
+    public float FILL_LEGEND_BLUE = -1;
+    public float COLOR_LEGEND_RED = 0;
+    public float COLOR_LEGEND_GREEN = 0;
+    public float COLOR_LEGEND_BLUE = 0;
+    public float LEGEND_LABEL_TEXT_SIZE = 15;
+    public float LEGEND_TEXT_SIZE = 10;
+
+    /**
+     * Create controller.
+     */
+    public View_PlayerHuman_Legend(Controller_PlayerHuman_Legend controller_player_Score, View_Player view) {
+        super(controller_player_Score, view);
+    }
+
+    public Controller_PlayerHuman_Legend getController() {
+        return (Controller_PlayerHuman_Legend) super.getController();
+    }
+
+    public View_Player getParentView() {
+        return (View_Player) super.getParentView();
+    }
+
+    public void setup()  {
+        LEGEND_START_X = this.getController().getParentController().getGridController().getView().GRID_START_X
+                + this.getController().getParentController().getGridController().getView().GRID_WIDTH
+                + View_Player_Grid.GRID_PADDING_RIGHT
+                + LEGEND_PADDING_LEFT;
+        LEGEND_START_Y = LEGEND_PADDING_TOP
+                + this.getController().getParentController().getScoreController().getView().SCORE_START_Y
+                + this.getController().getParentController().getScoreController().getView().SCORE_HEIGHT;
+        LEGEND_WIDTH = Math.max(this.getParentView().SIZE_MATRIX_ELEMENT_X * 4, View_Player_Grid.MIN_WIDTH_TO_LEAVE_BLANK);
+        LEGEND_HEIGHT = 119;
+
+        FILL_LEGEND_RED = this.getController().getParentController().getGridController().getView().FILL_GRID_RED;
+        FILL_LEGEND_GREEN = this.getController().getParentController().getGridController().getView().FILL_GRID_GREEN;
+        FILL_LEGEND_BLUE = this.getController().getParentController().getGridController().getView().FILL_GRID_BLUE;
+    }
+
+    public void draw()  {
+        // Fill rectangle.
+        this.getParentView().getParentView().useDefaultStroke();
+        fill(FILL_LEGEND_RED, FILL_LEGEND_GREEN, FILL_LEGEND_BLUE);
+        rect(LEGEND_START_X, LEGEND_START_Y, LEGEND_WIDTH, LEGEND_HEIGHT);
+
+        // Legend label.
+        textSize(LEGEND_LABEL_TEXT_SIZE);
+        textAlign(CENTER, TOP);
+        fill(COLOR_LEGEND_RED, COLOR_LEGEND_GREEN, COLOR_LEGEND_BLUE);
+        this.getController().getParentController().getParentController();
+        text(
+                Controller_Tetris.translate("Legend"),
+                LEGEND_START_X + 0.5f * LEGEND_WIDTH,
+                LEGEND_START_Y + 0.0f * LEGEND_HEIGHT);
+        // Score.
+        textSize(LEGEND_TEXT_SIZE);
+        textAlign(LEFT, TOP);
+        text(
+                this.getController().getLegend(),
+                LEGEND_START_X + 5,
+                LEGEND_START_Y + 0.0f * LEGEND_HEIGHT + LEGEND_LABEL_TEXT_SIZE + 5,
+                LEGEND_WIDTH - 5,
+                LEGEND_HEIGHT - (LEGEND_LABEL_TEXT_SIZE + 5));
+    }
+}
+
+
+public class View_PlayerRobotGenetic_Grid extends View_Player_Grid
+{
+    /**
+     * Create controller.
+     */
+    public View_PlayerRobotGenetic_Grid(Controller_PlayerRobotGenetic_Grid controller_player_grid, View_PlayerRobotGenetic view) {
+        super(controller_player_grid, view);
+    }
+
+    public View_PlayerRobotGenetic getParentView() {
+        return (View_PlayerRobotGenetic) super.getParentView();
+    }
+
+    public void draw()  {
+        super.draw();
+    }
+}
+
+
+public class View_PlayerRobotRandom_Grid extends View_Player_Grid
+{
+    /**
+     * Create controller.
+     */
+    public View_PlayerRobotRandom_Grid(Controller_PlayerRobotRandom_Grid controller_player_grid, View_PlayerRobotRandom view) {
+        super(controller_player_grid, view);
+    }
+
+    public View_PlayerRobotRandom getParentView() {
+        return (View_PlayerRobotRandom) super.getParentView();
+    }
+}
+
+
+public interface View
+{
+    /**
+     * Get parent view.
+     */
+    public View getParentView();
+
+    /**
+     * Get controller associated with this view.
+     */
+    public Controller getController();
+
+    /**
+     * Prepare view.
+     */
+    public void setup() ;
+
+    /**
+     * Draw view.
+     */
+    public void draw() ;
+
+    /*
+     * On mouse pressed.
+     */
+    public void mousePressed() ;
+
+    /*
+    * On mouse moved.
+    */
+    public void mouseMoved() ;
+
+    /*
+    * On key pressed.
+    */
+    public void keyPressed() ;
+
+
+    /*
+    * On mouse dragged.
+    */
+    public void mouseDragged() ;
+}
+
+
+public abstract class View_Abstract implements View
+{
+    protected Controller controller;
+    protected View parentView;
+
+    // Actions.
+    public static final int ACTION_SETUP = 1;
+    public static final int ACTION_DRAW = 2;
+    public static final int ACTION_MOUSE_PRESSED = 3;
+    public static final int ACTION_MOUSE_MOVED = 4;
+    public static final int ACTION_KEY_PRESSED = 5;
+    public static final int ACTION_MOUSE_DRAGGED = 6;
+
+    public static int[] getAllActionConstants() {
+        return new int[]{ACTION_SETUP, ACTION_DRAW, ACTION_MOUSE_PRESSED, ACTION_MOUSE_MOVED, ACTION_KEY_PRESSED};
+    }
+
+    /**
+     * Create view.
+     */
+    public View_Abstract(Controller controller, View parentView) {
+        this.controller = controller;
+        this.parentView = parentView;
+    }
+
+    public Controller getController() {
+        return controller;
+    }
+
+    public View getParentView() {
+        return parentView;
+    }
+
+    /**
+     * Do action.
+     */
+    public Object doAction(int action)  {
+        switch (action) {
+            case ACTION_SETUP:
+                this.setup();
+                break;
+            case ACTION_DRAW:
+                this.draw();
+                break;
+            case ACTION_MOUSE_PRESSED:
+                this.mousePressed();
+                break;
+            case ACTION_MOUSE_MOVED:
+                this.mouseMoved();
+                break;
+            case ACTION_KEY_PRESSED:
+                this.keyPressed();
+                break;
+            case ACTION_MOUSE_DRAGGED:
+                this.mouseDragged();
+        }
+        return null;
+    }
+
+    public void setup()  {
+    }
+
+    public void draw()  {
+    }
+
+    public void mousePressed()  {
+    }
+
+    public void mouseMoved()  {
+    }
+
+    public void keyPressed()  {
+    }
+
+    public void mouseDragged()  {
+    }
+}
+
+
+public abstract class View_AbstractWithChildren extends View_Abstract
+{
+    protected View_Abstract[] views;
+    protected boolean[] activeViews;
+    protected int n;
+
+    /**
+     * Create view.
+     */
+    public View_AbstractWithChildren(Controller controller, View parentView, int maxNumberOfChildren) {
+        super(controller, parentView);
+        this.views = new View_Abstract[maxNumberOfChildren];
+        this.activeViews = new boolean[maxNumberOfChildren];
+        this.n = 0;
+    }
+
+    /**
+     * Add new child view.
+     */
+    public void addViewChild(View_Abstract v) {
+        this.views[n] = v;
+        this.activeViews[n++] = true;
+    }
+
+    /**
+     * Do action for all children.
+     */
+    public void doActionForAllChildren(int action)  {
+        for (int i = 0; i < n; i++) {
+            if (activeViews[i]) {
+                views[i].doAction(action);
+            }
+        }
+    }
+
+    public void setup()  {
+        super.setup();
+        this.doActionForAllChildren(View_Abstract.ACTION_SETUP);
+    }
+
+    public void draw()  {
+        super.draw();
+        this.doActionForAllChildren(View_Abstract.ACTION_DRAW);
+    }
+
+    public void mousePressed()  {
+        super.mousePressed();
+        this.doActionForAllChildren(View_Abstract.ACTION_MOUSE_PRESSED);
+    }
+
+    public void mouseMoved()  {
+        super.mouseMoved();
+        this.doActionForAllChildren(View_Abstract.ACTION_MOUSE_MOVED);
+    }
+
+    public void keyPressed()  {
+        super.keyPressed();
+        this.doActionForAllChildren(View_Abstract.ACTION_KEY_PRESSED);
+    }
+
+    public void mouseDragged()  {
+        super.mouseDragged();
+        this.doActionForAllChildren(View_Abstract.ACTION_MOUSE_DRAGGED);
+    }
+}
+
+
+public class View_Background extends View_Abstract
+{
+    public float BACKGROUND_RED = 230;
+    public float BACKGROUND_GREEN = 230;
+    public float BACKGROUND_BLUE = 230;
+    public float BACKGROUND_RECTANGLE_STROKE_RED = 0;
+    public float BACKGROUND_RECTANGLE_STROKE_GREEN = 0;
+    public float BACKGROUND_RECTANGLE_STROKE_BLUE = 0;
+    public float BACKGROUND_PADDING = 5;
+
+    /**
+     * Create view.
+     */
+    public View_Background(Controller_Background controller_background, View_Tetris view) {
+        super(controller_background, view);
+    }
+
+    public View_Tetris getParentView() {
+        return (View_Tetris) super.getParentView();
+    }
+
+    public Controller_Background getController() {
+        return (Controller_Background)super.getController();
+    }
+
+    public void draw() {
+        // Background.
+        background(BACKGROUND_RED, BACKGROUND_GREEN, BACKGROUND_BLUE);
+
+        // Rectangle.
+        noFill();
+        stroke(BACKGROUND_RECTANGLE_STROKE_RED,
+                BACKGROUND_RECTANGLE_STROKE_GREEN,
+                BACKGROUND_RECTANGLE_STROKE_BLUE
+        );
+        rect(BACKGROUND_PADDING, BACKGROUND_PADDING,
+                this.getParentView().WIDTH - BACKGROUND_PADDING * 2, this.getParentView().HEIGHT - BACKGROUND_PADDING * 2);
+
+        if (this.getController().getParentController().isGameOver() == true && this.getParentView().resultsPopup == 1){
+            var players = [];for (Controller_PlayerAbstract cp : this.getController().getParentController().getPlayerControllers()) {players.push({n: cp.getPlayerName(), s: cp.getScore(), m : cp.getNumberOfMoves(), ti: new Date().getTime(), ty: cp.getModel().getType(), l: Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID, c: Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID, d: View_Player_Grid.DRAW_YOUR_OWN_BLOCKS ? 1 :0});}this.getParentView().resultsPopup++;players.sort(function(a,b){if (a.score < b.score) { return -1; } return a.score == b.score ? 0 : 1;});
+            gameOver(players);
+        }
+    }
+}
+
+
+public class View_Language extends View_Abstract
+{
+    public boolean IS_ACTIVE = true;
+
+    protected static PImage[] languageImages;
+    protected static String[] languageCodes;
+    public float LANGUAGE_START_X = -1;
+    public float LANGUAGE_WIDTH = 48;
+    public int LANGUAGE_DIRECTION = -1;
+    public float LANGUAGE_PADDING = 5;
+    public float LANGUAGE_START_Y;
+    public float LANGUAGE_HEIGHT = 48;
+
+    protected int mouseOverLanguage = -1;
+    protected float[] languageImagesX1;
+    protected float[] languageImagesX2;
+    protected float[] languageImagesY1;
+    protected float[] languageImagesY2;
+
+    /**
+     * Create language view.
+     */
+    public View_Language(Controller_Language controller, View_Tetris view_tetris) {
+        super(controller, view_tetris);
+    }
+
+    public Controller_Language getController() {
+        return (Controller_Language) super.getController();
+    }
+
+    public View_Tetris getParentView() {
+        return (View_Tetris) super.getParentView();
+    }
+
+    public void setup()  {
+        if (!IS_ACTIVE) {
+            return;
+        }
+
+        LANGUAGE_START_X = this.getParentView().WIDTH - LANGUAGE_WIDTH - this.getParentView().getBackgroundPadding() - 2;
+        LANGUAGE_START_Y = this.getParentView().getBackgroundPadding() + 3;
+
+        // Load icon images and save language codes.
+        Model_Language[] languages = this.getController().getAvailableLanguages();
+        if (languageCodes == null) {
+            languageImages = new PImage[languages.length];
+            languageCodes = new String[languages.length];
+            for (int i = 0; i < languages.length; i++) {
+                languageImages[languages.length - i - 1]
+                        = loadImage(this.getController().getIconLink(languages[i]));
+                if (languageImages[languages.length - i - 1] == null
+                        || languageImages[languages.length - i - 1].width == 0
+                        || languageImages[languages.length - i - 1].height == 0) {
+                    this.getParentView().addError(
+                            new Exception(
+                                    Controller_Tetris.translate("Language image not found.")
+                            )
+                    );
+                }
+                languageCodes[languages.length - i - 1] = languages[i].getCode();
+            }
+        }
+
+        // Init arrays.
+        languageImagesX1 = new float[languages.length];
+        languageImagesX2 = new float[languages.length];
+        languageImagesY1 = new float[languages.length];
+        languageImagesY2 = new float[languages.length];
+        this.computeImagesLimits();
+    }
+
+    public void draw()  {
+        if (!IS_ACTIVE) {
+            return;
+        }
+
+        // Draw icon images.
+        imageMode(CORNER);
+        for (int i = 0; i < languageImages.length; i++) {
+            if (languageImages[i] != null) {
+                float transparency = i != this.mouseOverLanguage ? 128 : 255;
+                tint(255, transparency);
+                image(languageImages[i],
+                        languageImagesX1[i],
+                        languageImagesY1[i]);
+            }
+        }
+        tint(255, 255);
+
+        if (this.getController().getParentController().isGameOver() == true && this.getParentView().resultsPopup == 1){
+            var players = [];for (Controller_PlayerAbstract cp : this.getController().getParentController().getPlayerControllers()) {players.push({n: cp.getPlayerName(), s: cp.getScore(), m : cp.getNumberOfMoves(), ti: new Date().getTime(), ty: cp.getModel().getType(), l: Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID, c: Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID, d: View_Player_Grid.DRAW_YOUR_OWN_BLOCKS ? 1 :0});}this.getParentView().resultsPopup++;players.sort(function(a,b){if (a.score < b.score) { return -1; } return a.score == b.score ? 0 : 1;});
+            gameOver(players);
+        }
+    }
+
+    public void mousePressed()  {
+        if (!IS_ACTIVE) {
+            return;
+        }
+
+        int mx = mouseX;
+        int my = mouseY;
+
+        // On click on an language icon image, the language will be set.
+        for (int i = 0; i < languageImages.length; i++) {
+            if (mx >= languageImagesX1[i] && mx <= languageImagesX2[i]
+                    && my >= languageImagesY1[i] && my <= languageImagesY2[i]) {
+                //this.getController().getParentController().getAppUrl(true);
+                String oldCurrentLanguage = this.getController().getCurrentLanguage().getCode();
+                String newCurrentLanguage = languageCodes[i];
+                $('#language-' + oldCurrentLanguage).removeClass('active');
+                $('#language-' + newCurrentLanguage).addClass('active');
+                this.getController().setCurrentLanguage(languageCodes[i]);
+                String translatedTitle = Controller_Tetris.translate("Go back");
+                String appUrl = this.getController().getParentController().getAppUrl(true);
+                String translatedTopPlayers = Controller_Tetris.translate("Show Top Players");
+                $('#game .home a').attr('href', appUrl + "play/players");
+                $('#game .home a img').attr('title', translatedTitle);
+                $('.top-players-link').html(translatedTopPlayers);
+            }
+        }
+    }
+
+    public void mouseMoved()  {
+        if (!IS_ACTIVE) {
+            return;
+        }
+
+        int mx = mouseX;
+        int my = mouseY;
+
+        int oldMouseOverLanguage = this.mouseOverLanguage;
+        this.mouseOverLanguage = -1;
+
+        // Check if mouse is over one of the icon images.
+        for (int i = 0; i < languageImages.length; i++) {
+            if (mx >= languageImagesX1[i] && mx <= languageImagesX2[i]
+                    && my >= languageImagesY1[i] && my <= languageImagesY2[i]) {
+                this.mouseOverLanguage = i;
+                this.getParentView().askCursorToBe(HAND);
+                break;
+            }
+        }
+        if (oldMouseOverLanguage != this.mouseOverLanguage) {
+            redraw();
+        }
+
+    }
+
+    /**
+     * Compute x1, x2, y1 and y2 points for each icon image.
+     */
+    protected void computeImagesLimits() {
+        for (int i = 0; i < languageImages.length; i++) {
+            languageImagesX1[i] = LANGUAGE_START_X + i * LANGUAGE_DIRECTION * LANGUAGE_WIDTH + i * LANGUAGE_DIRECTION * LANGUAGE_PADDING;
+            languageImagesX2[i] = languageImagesX1[i] + LANGUAGE_WIDTH;
+            languageImagesY1[i] = LANGUAGE_START_Y;
+            languageImagesY2[i] = LANGUAGE_START_Y + LANGUAGE_HEIGHT;
+        }
+    }
+}
+
+
+public abstract class View_Player extends View_AbstractWithChildren
+{
+    public static int COUNTER_PLAYER = 0;
+    protected static float COUNTER_PLAYER_START_X = -1;
+
+    public float PLAYER_START_X = -1;
+    public float PLAYER_START_Y = -1;
+    public float PLAYER_WIDTH = -1;
+    public float PLAYER_HEIGHT = -1;
+    public float PLAYER_PADDING_DOWN = 10;
+    public float PLAYER_PADDING_UP = 10;
+    public float PLAYER_PADDING_LEFT = 10;
+    public float PLAYER_PADDING_RIGHT = 10;
+
+    public float PLAYER_RECTANGLE_FILL_RED = 250;
+    public float PLAYER_RECTANGLE_FILL_GREEN = 250;
+    public float PLAYER_RECTANGLE_FILL_BLUE = 250;
+
+    public float SIZE_MATRIX_ELEMENT_X = -1;
+    public float SIZE_MATRIX_ELEMENT_Y = -1;
+
+    public float TETROMINO_STROKE_WEIGHT = -1;
+    public float TETROMINO_STROKE_RED = 133;
+    public float TETROMINO_STROKE_GREEN = 133;
+    public float TETROMINO_STROKE_BLUE = 133;
+
+    public static final int TETROMINO_MODE_TOP = 0;
+    public static final int TETROMINO_MODE_CENTER = 1;
+    public static final int TETROMINO_MODE_BOTTOM = 2;
+    public static final int TETROMINO_MODE_LEFT = 3;
+    public static final int TETROMINO_MODE_MIDDLE = 4;
+    public static final int TETROMINO_MODE_RIGHT = 5;
+    protected int tetrominoModeH = TETROMINO_MODE_TOP;
+    protected int tetrominoModeV = TETROMINO_MODE_RIGHT;
+
+    /**
+     * Create view.
+     */
+    public View_Player(Controller_PlayerAbstract controller_player, View_Tetris view) {
+        super(controller_player, view, 10);
+    }
+
+    public Controller_PlayerAbstract getController() {
+        return (Controller_PlayerAbstract) super.getController();
+    }
+
+    public View_Tetris getParentView() {
+        return (View_Tetris) super.getParentView();
+    }
+
+    public void setup()  {
+        // Set params.
+        int n = this.getController().getParentController().getNumberOfPlayers();
+        COUNTER_PLAYER++;
+        switch (n) {
+            case 1:
+                PLAYER_PADDING_LEFT = 225;
+                PLAYER_PADDING_RIGHT = 225;
+            default:
+                switch (COUNTER_PLAYER) {
+                    case 1:
+                        COUNTER_PLAYER_START_X = this.getParentView().getBackgroundPadding() + PLAYER_PADDING_LEFT;
+                        break;
+                    default:
+//                        COUNTER_PLAYER_START_X += PLAYER_PADDING_LEFT;
+                        break;
+                }
+                PLAYER_START_X = COUNTER_PLAYER_START_X;
+                PLAYER_START_Y = this.getParentView().getController().getTitleController().getView().TITLE_Y
+                        + this.getParentView().getController().getTitleController().getView().TITLE_HEIGHT / 2
+                        + PLAYER_PADDING_UP;
+                PLAYER_WIDTH = (this.getParentView().WIDTH - this.getParentView().getBackgroundPadding() * 2
+                        - PLAYER_PADDING_LEFT - n * PLAYER_PADDING_RIGHT
+                ) / n;
+                PLAYER_HEIGHT = this.getParentView().HEIGHT
+                        - PLAYER_START_Y
+                        - PLAYER_PADDING_DOWN
+                        - this.getController().getParentController().getBackgroundController().getView().BACKGROUND_PADDING;
+                COUNTER_PLAYER_START_X += PLAYER_WIDTH + PLAYER_PADDING_RIGHT;
+                break;
+        }
+
+        // Tetromino = 4x4 matrix of squares. (each element is a square)
+        // The grid view should have NUMBER_OF_COLUMNS_TETRIS_GRID squares on one line => NUMBER_OF_COLUMNS_TETRIS_GRID squares width.
+        // The grid view should have NUMBER_OF_LINES_TETRIS_GRID squares on one column => NUMBER_OF_LINES_TETRIS_GRID squares height.
+        // The next-tetromino view should be big enough for a 4x4-matrix tetromino => 4 squares width and 4 squares height.
+
+        // player_width = grid_width + next_width + padding stuff = (NUMBER_OF_COLUMNS_TETRIS_GRID + 4) squares + padding stuff
+        // player_height = grid_height + padding stuff = NUMBER_OF_LINES_TETRIS_GRID squares + padding stuff
+
+        float width = (PLAYER_WIDTH
+                - View_Player_Grid.GRID_PADDING_LEFT - View_Player_Grid.GRID_PADDING_RIGHT
+                - Math.max(View_Player_Next.NEXT_PADDING_LEFT, View_Player_Score.SCORE_PADDING_LEFT)
+                - Math.max(View_Player_Next.NEXT_PADDING_RIGHT, View_Player_Score.SCORE_PADDING_RIGHT)
+        );
+        SIZE_MATRIX_ELEMENT_X = width / (Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID + 4);
+        if (SIZE_MATRIX_ELEMENT_X * 4 < View_Player_Grid.MIN_WIDTH_TO_LEAVE_BLANK) {
+            SIZE_MATRIX_ELEMENT_X = (width - View_Player_Grid.MIN_WIDTH_TO_LEAVE_BLANK) / Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID;
+        }
+        SIZE_MATRIX_ELEMENT_Y = (PLAYER_HEIGHT - PLAYER_PADDING_DOWN)
+                / Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID;
+        TETROMINO_STROKE_WEIGHT = 0.07f * Math.min(SIZE_MATRIX_ELEMENT_X, SIZE_MATRIX_ELEMENT_Y);
+
+        // Add view children.
+        this.addViewChildrenFromControllers();
+
+        super.setup();
+    }
+
+    /**
+     * Add views created by controllers to current view.
+     */
+    protected void addViewChildrenFromControllers() {
+        this.addViewChild(this.getController().getGridController().getView());
+        this.addViewChild(this.getController().getNextController().getView());
+        this.addViewChild(this.getController().getScoreController().getView());
+        this.addViewChild(this.getController().getInfoController().getView());
+    }
+
+    public void draw()  {
+        // Rectangle.
+        noStroke();
+        fill(PLAYER_RECTANGLE_FILL_RED, PLAYER_RECTANGLE_FILL_GREEN, PLAYER_RECTANGLE_FILL_BLUE);
+        rect(PLAYER_START_X, PLAYER_START_Y, PLAYER_WIDTH, PLAYER_HEIGHT);
+
+        super.draw();
+
+        if (this.getController().getParentController().isGameOver() == true && this.getParentView().resultsPopup == 1){
+            var players = [];for (Controller_PlayerAbstract cp : this.getController().getParentController().getPlayerControllers()) {players.push({n: cp.getPlayerName(), s: cp.getScore(), m : cp.getNumberOfMoves(), ti: getTime(), ty: cp.getModel().getType(), l: Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID, c: Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID, d: View_Player_Grid.DRAW_YOUR_OWN_BLOCKS ? 1 :0});}this.getParentView().resultsPopup++;players.sort(function(a,b){if (a.score < b.score) { return -1; } return a.score == b.score ? 0 : 1;});
+            gameOver(players);
+        }
+    }
+
+    /**
+     * Set tetromino mode for drawing.
+     */
+    public void tetrominoMode(int tetrominoModeH, int tetrominoModeV) {
+        this.tetrominoModeH = tetrominoModeH;
+        this.tetrominoModeV = tetrominoModeV;
+    }
+
+    /**
+     * Draw grid from matrix.
+     * The color of each grid element is oneColor.
+     * If oneColor is null then the color of each grid element is given by the value of the element.
+     */
+    public void grid(short[][] matrix, float x, float y, Short oneColor) {
+        float startX = 0;
+        float startY = 0;
+        switch (this.tetrominoModeH) {
+            case TETROMINO_MODE_LEFT:
+                startX = x - (float) matrix[0].length * SIZE_MATRIX_ELEMENT_X;
+                break;
+            case TETROMINO_MODE_CENTER:
+                startX = x - (float) matrix[0].length / 2 * SIZE_MATRIX_ELEMENT_X;
+                break;
+            case TETROMINO_MODE_RIGHT:
+                startX = x;
+                break;
+        }
+        switch (this.tetrominoModeV) {
+            case TETROMINO_MODE_TOP:
+                startY = y;
+                break;
+            case TETROMINO_MODE_MIDDLE:
+                startY = y - (float) matrix.length / 2 * SIZE_MATRIX_ELEMENT_Y;
+                break;
+            case TETROMINO_MODE_BOTTOM:
+                startY = y - (float) matrix.length * SIZE_MATRIX_ELEMENT_Y;
+                break;
+        }
+
+        // Prepare drawing.
+        stroke(TETROMINO_STROKE_RED, TETROMINO_STROKE_GREEN, TETROMINO_STROKE_BLUE);
+        strokeWeight(TETROMINO_STROKE_WEIGHT);
+        if (oneColor != null) {
+            this.prepareFillForTetromino(oneColor);
+        }
+
+        // Draw it.
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                if (matrix[i][j] != 0) {
+                    if (oneColor == null) {
+                        this.prepareFillForTetromino(matrix[i][j]);
+                    }
+                    rect(
+                            startX + j * SIZE_MATRIX_ELEMENT_X,
+                            startY + i * SIZE_MATRIX_ELEMENT_Y,
+                            SIZE_MATRIX_ELEMENT_X,
+                            SIZE_MATRIX_ELEMENT_Y);
+                }
+            }
+        }
+    }
+
+    /**
+     * Draw tetromino on position x , y.
+     */
+    public void tetromino(Model_Tetromino t, float x, float y) {
+        grid(t.getCurrentRotation(), x, y, t.getColor());
+    }
+    public int getTime() {
+        int time = new Date().getTime();
+        int fixTime = 0;
+        for (Controller_PlayerAbstract cp : this.getController().getParentController().getPlayerControllers()) {
+            fixTime += cp.getT()%6400;
+        }
+        return int(time/10000)*10000+fixTime%10000;
+    }
+    /**
+     * Prepare fill color depending on constant color.
+     */
+    protected void prepareFillForTetromino(int color) {
+        float red = 0, green = 0, blue = 0, transparency = 255;
+        switch (color) {
+            case Model_Color.BLUE:
+                red = 0;
+                green = 0;
+                blue = 255;
+                break;
+            case Model_Color.GREEN:
+                red = 0;
+                green = 255;
+                blue = 0;
+                break;
+            case Model_Color.LIGHT_BLUE:
+                red = 0;
+                green = 255;
+                blue = 255;
+                break;
+            case Model_Color.ORANGE:
+                red = 255;
+                green = 128;
+                blue = 0;
+                break;
+            case Model_Color.PINK:
+                red = 200;
+                green = 0;
+                blue = 200;
+                break;
+            case Model_Color.RED:
+                red = 200;
+                green = 33;
+                blue = 33;
+                break;
+            case Model_Color.YELLOW:
+                red = 255;
+                green = 255;
+                blue = 0;
+                break;
+            case Model_Color.WHITE:
+                red = 255;
+                green = 255;
+                blue = 255;
+                transparency = 128;
+                break;
+            case Model_Color.BLACK:
+                red = 0;
+                green = 0;
+                blue = 0;
+                break;
+            case Model_Color.PURPLE:
+                red = 90;
+                green = 51;
+                blue = 189;
+                break;
+        }
+        fill(red, green, blue, transparency);
+    }
+}
+
+public class View_PlayerHuman extends View_Player
+{
+    /**
+     * Create view.
+     */
+    public View_PlayerHuman(Controller_PlayerHuman controller_player, View_Tetris view) {
+        super(controller_player, view);
+    }
+
+    public Controller_PlayerHuman getController() {
+        return (Controller_PlayerHuman) super.getController();
+    }
+
+    protected void addViewChildrenFromControllers() {
+        super.addViewChildrenFromControllers();
+        this.addViewChild(this.getController().getLegendController().getView());
+    }
+
+    public void mousePressed()  {
+        super.mousePressed();
+    }
+}
+
+
+public abstract class View_PlayerRobot extends View_Player
+{
+    protected boolean nextTimeSearchMove = false;
+    public boolean SEARCH_MOVE_MESSAGE_DISPLAYED = true;
+
+    /**
+     * Create view.
+     */
+    public View_PlayerRobot(Controller_PlayerRobot controller_player, View_Tetris view) {
+        super(controller_player, view);
+    }
+
+    public Controller_PlayerRobot getController() {
+        return (Controller_PlayerRobot) super.getController();
+    }
+
+    public void draw()  {
+        super.draw();
+        if (this.nextTimeSearchMove) {
+            this.getController().findNextMove();
+            this.getController().makeNextMove();
+            this.nextTimeSearchMove = false;
+        }
+        if (this.getController().getParentController().isGameStarted()
+                && !this.getController().isGameOver()
+                && this.getController().isReady()
+                ) {
+            if (SEARCH_MOVE_MESSAGE_DISPLAYED) {
+                this.getController().getGridController().getView().messageOnGrid(Controller_Tetris.translate("Searching move..."));
+            }
+            this.nextTimeSearchMove = true;
+        }
+    }
+}
+
+
+public class View_PlayerRobotGenetic extends View_PlayerRobot
+{
+    /**
+     * Create view.
+     */
+    public View_PlayerRobotGenetic(Controller_PlayerRobotGenetic controller_player, View_Tetris view)  {
+        super(controller_player, view);
+        SEARCH_MOVE_MESSAGE_DISPLAYED = Controller_PlayerHuman.counter > 0
+                && Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID*Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID > 20*10;
+    }
+
+    public Controller_PlayerRobotGenetic getController() {
+        return (Controller_PlayerRobotGenetic) super.getController();
+    }
+
+    public void setup()  {
+        super.setup();
+        if (this.getController().getModel().getM()*this.getController().getModel().getN() > 30*30) {
+            this.getParentView().addError(
+                    new Model_Exception(
+                            Controller_Tetris.translate("Robot Genetic cannot play on a grid larger than 30x30.")
+                    )
+            );
+            this.getController().playerGameOver();
+        }
+    }
+
+}
+
+
+public class View_PlayerRobotRandom extends View_PlayerRobot
+{
+    /**
+     * Create view.
+     */
+    public View_PlayerRobotRandom(Controller_PlayerRobotRandom controller_player, View_Tetris view) {
+        super(controller_player, view);
+        SEARCH_MOVE_MESSAGE_DISPLAYED = false;
+    }
+
+    public Controller_PlayerRobotRandom getController() {
+        return (Controller_PlayerRobotRandom) super.getController();
+    }
+
+    public void setup()  {
+        super.setup();
+        this.getController().getGridController().enableFalling();
+    }
+}
+
+
+public class View_Restart extends View_Abstract
+{
+    public float RESTART_X = -1;
+    public float RESTART_Y = -1;
+    public float RESTART_WIDTH = -1;
+    public float RESTART_HEIGHT = -1;
+    public float RESTART_TEXT_SIZE = 20;
+
+    public float RESTART_COLOR_RED = 255;
+    public float RESTART_COLOR_GREEN = 255;
+    public float RESTART_COLOR_BLUE = 255;
+
+    /**
+     * Create view.
+     */
+    public View_Restart(Controller_Restart controller, View_Tetris view_tetris) {
+        super(controller, view_tetris);
+    }
+
+    public Controller_Restart getController() {
+        return (Controller_Restart) super.getController();
+    }
+
+    public View_Tetris getParentView() {
+        return (View_Tetris) super.getParentView();
+    }
+
+    public void setup()  {
+        RESTART_X = 10;
+        RESTART_Y = this.getController().getParentController().getTitleController().getView().TITLE_HEIGHT / 2 + this.getParentView().getBackgroundPadding() + 2;
+        textSize(RESTART_TEXT_SIZE);
+        RESTART_WIDTH = textWidth(this.getController().getRestartMessage());
+        RESTART_HEIGHT = RESTART_TEXT_SIZE;
+
+        if (!this.getController().getParentController().getTitleController().getView().IS_ACTIVE) {
+            RESTART_COLOR_RED = 0;
+            RESTART_COLOR_GREEN = 0;
+            RESTART_COLOR_BLUE = 0;
+        }
+    }
+
+    public void draw()  {
+        if (!this.isActive()) {
+            return;
+        }
+        // Image.
+        textAlign(LEFT, CENTER);
+        fill(RESTART_COLOR_RED, RESTART_COLOR_GREEN, RESTART_COLOR_BLUE);
+        textSize(RESTART_TEXT_SIZE);
+        text(this.getController().getRestartMessage(), RESTART_X, RESTART_Y);
+
+        if (this.getController().getParentController().isGameOver() == true && this.getParentView().resultsPopup == 1){
+            var players = [];for (Controller_PlayerAbstract cp : this.getController().getParentController().getPlayerControllers()) {players.push({n: cp.getPlayerName(), s: cp.getScore(), m : cp.getNumberOfMoves(), ti: new Date().getTime(), ty: cp.getModel().getType(), l: Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID, c: Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID, d: View_Player_Grid.DRAW_YOUR_OWN_BLOCKS ? 1 :0});}this.getParentView().resultsPopup++;players.sort(function(a,b){if (a.score < b.score) { return -1; } return a.score == b.score ? 0 : 1;});
+            gameOver(players);
+        }
+    }
+
+    /**
+     * Should display Restart?
+     */
+    protected boolean isActive() {
+        return this.getController().getParentController().isGameStarted() == true
+                && (this.getController().getParentController().isGameOver() == true || Controller_PlayerHuman.counter == 0);
+    }
+
+    public void mousePressed() {
+        if (!this.isActive()) {
+            return;
+        }
+
+        int mx = mouseX;
+        int my = mouseY;
+
+        // Restart game.
+        if (mx >= RESTART_X
+                && mx <= RESTART_X + RESTART_WIDTH
+                && my >= RESTART_Y - RESTART_HEIGHT / 2
+                && my <= RESTART_Y + RESTART_HEIGHT / 2
+                ) {
+            this.getParentView().setRestart(true);
+        }
+    }
+
+    public void mouseMoved()  {
+        if (!this.isActive()) {
+            return;
+        }
+
+        int mx = mouseX;
+        int my = mouseY;
+
+        if (mx >= RESTART_X
+                && mx <= RESTART_X + RESTART_WIDTH
+                && my >= RESTART_Y - RESTART_HEIGHT / 2
+                && my <= RESTART_Y + RESTART_HEIGHT / 2
+                ) {
+            this.getParentView().askCursorToBe(HAND);
+        }
+    }
+}
+/* @pjs preload="/Media/Logo/Ai-Tetris-Logo.png,/Media/Language/en/icon.png,/Media/Language/ro/icon.png"; */
+
+
+public class View_Tetris extends View_AbstractWithChildren
+{
+    public static final int GAME_STATE_IN_GAME = 1;
+    public static final int GAME_STATE_IN_GENETIC_TRAINING = 2;
+    public int GAME_STATE;
+
+    // Params.
+    public int WIDTH = 900;
+    public int HEIGHT = 600;
+    public float STROKE_WEIGHT = 1;
+    public float STROKE_RED = 0;
+    public float STROKE_GREEN = 0;
+    public float STROKE_BLUE = 0;
+    public static float FRAME_RATE = 10;
+    protected boolean restart;
+
+    // Controller.
+    protected int currentCursorType = -1;
+    protected Exception[] errors;
+    protected int noOfErrors = 0;
+    protected int resultsPopup = 0;
+
+    /**
+     * Create Tetris view.
+     */
+    public View_Tetris(
+                    start
+    )  {
+        int w = int(Controller_Tetris.getParameterByName("w"));
+        if (w) {
+            this.WIDTH = w;
+        }
+        int h = int(Controller_Tetris.getParameterByName("h"));
+        if (h) {
+            this.HEIGHT = h;
+        }
+        super(null, null, 10);
+    }
+
+    public void setup()  {
+        this.initGame();
+        // Set language.
+        var activeLanguage = $('.language-div li.active');
+        var idActiveLanguage = activeLanguage ? activeLanguage.attr('id') : null;
+        var codeLanguage = idActiveLanguage ? idActiveLanguage.substr(9) : null;
+        if (codeLanguage) {
+            view.getController().getLanguageController().setCurrentLanguage(codeLanguage);
+        }
+        size(WIDTH, HEIGHT);
+        super.setup();
+        frameRate(FRAME_RATE);
+        cursor(ARROW);
+        //noLoop();
+    }
+
+    /**
+     * Init and start game.
+     */
+    private void initGame()  {
+        // Create tetris controller. It will create the entire MVC environment.
+        this.controller = new Controller_Tetris(this);
+
+
+
+        // Add background view.
+        this.addViewChild(this.getController().getBackgroundController().getView());
+
+        // Add title view.
+        this.addViewChild(this.getController().getTitleController().getView());
+
+        // Add language view created.
+        this.addViewChild(this.getController().getLanguageController().getView());
+
+        // Add restart game view created.
+        this.addViewChild(this.getController().getRestartController().getView());
+
+        // Errors.
+        this.errors = new Exception[10];
+
+        this.getController().setGameStarted(false);
+        this.resultsPopup = 1;
+
+        this.startGame();
+    }
+
+    /**
+     * Start game.
+     */
+    public void startGame()  {
+        if (Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID < 10
+                || Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID > WIDTH
+                || Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID < 5
+                || Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID > HEIGHT) {
+            if (this.getNoOfErrors() == 0) {
+                this.addError(
+                        new Model_Exception(
+                                Controller_Tetris.translate("Grid cannot be smaller than 10x5 or higher than ")
+                                        + WIDTH + "x" + HEIGHT + "."
+                        )
+                );
+            }
+            return;
+        }
+        // Set player types.
+        String firstPlayer = Controller_Tetris.getParameterByName("p1");
+        String secondPlayer = Controller_Tetris.getParameterByName("p2");
+        int[] playerTypes;
+         if (firstPlayer && secondPlayer) {
+            playerTypes = new int[]
+                {
+                        (firstPlayer ? (int)firstPlayer : Model_Player.PLAYER_TYPE_HUMAN),
+                        (secondPlayer ? (int)secondPlayer : Model_Player.PLAYER_TYPE_ROBOT_GENETIC),
+                };
+          } else {
+            playerTypes = new int[]
+                {
+                        (firstPlayer ? (int)firstPlayer : Model_Player.PLAYER_TYPE_HUMAN)
+                };
+          }
+
+        this.getController().startGame(playerTypes);
+
+        // Add player views created.
+        for (Controller_PlayerAbstract playerController : this.getController().getPlayerControllers()) {
+            this.addViewChild(playerController.getView());
+        }
+    }
+
+    public void mouseMoved()  {
+        int oldCursorType = this.currentCursorType;
+        this.askCursorToBe(ARROW);
+        super.mouseMoved();
+        if (this.currentCursorType != oldCursorType) {
+            cursor(this.currentCursorType);
+        }
+    }
+
+    public void keyPressed()  {
+        if (!this.getController().isGameStarted()) {
+            this.getController().setGameStarted(true);
+        } else {
+            super.keyPressed();
+        }
+    }
+
+    public void draw()  {
+        super.draw();
+        if (this.getController().isGameOver() == true && this.resultsPopup == 1){
+            var players = [];for (Controller_PlayerAbstract cp : this.getController().getParentController().getPlayerControllers()) {players.push({n: cp.getPlayerName(), s: cp.getScore(), m : cp.getNumberOfMoves(), ti: new Date().getTime(), ty: cp.getModel().getType(), l: Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID, c: Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID, d: View_Player_Grid.DRAW_YOUR_OWN_BLOCKS ? 1 :0});}this.resultsPopup++;players.sort(function(a,b){if (a.score < b.score) { return -1; } return a.score == b.score ? 0 : 1;});
+            gameOver(players);
+        }
+    }
+
+    /**
+     * Get controller.
+     * @return Controller_Tetris
+     */
+    public Controller_Tetris getController() {
+        return (Controller_Tetris) this.controller;
+    }
+
+    /**
+     * Disable language view.
+     */
+    public void disableLanguageView() {
+        this.getController().getLanguageController().getView().IS_ACTIVE = false;
+        // If title view is disabled as well then set title_y and title_height to 0.
+        if (!this.getController().getTitleController().getView().IS_ACTIVE) {
+            this.getController().getTitleController().getView().TITLE_Y = 0;
+            this.getController().getTitleController().getView().TITLE_HEIGHT = 0;
+        }
+    }
+
+    /**
+     * Disable title view.
+     */
+    public void disableTitleView() {
+        this.getController().getTitleController().getView().IS_ACTIVE = false;
+        // If language view is disabled as well then set title_y and title_height to 0.
+        if (!this.getController().getLanguageController().getView().IS_ACTIVE) {
+            this.getController().getTitleController().getView().TITLE_Y = 0;
+            this.getController().getTitleController().getView().TITLE_HEIGHT = 0;
+        }
+    }
+
+    /**
+     * Set current cursor as cursorType.
+     */
+    public void askCursorToBe(int cursorType) {
+        this.currentCursorType = cursorType;
+    }
+
+    /**
+     * Get background padding value.
+     */
+    public float getBackgroundPadding() {
+        return this.getController().getBackgroundController().getView().BACKGROUND_PADDING;
+    }
+
+    /**
+     * Get background color - red.
+     */
+    public float getBackgroundColorRed() {
+        return this.getController().getBackgroundController().getView().BACKGROUND_RED;
+    }
+
+    /**
+     * Get background color - green.
+     */
+    public float getBackgroundColorGreen() {
+        return this.getController().getBackgroundController().getView().BACKGROUND_GREEN;
+    }
+
+    /**
+     * Get background color - blue.
+     */
+    public float getBackgroundColorBlue() {
+        return this.getController().getBackgroundController().getView().BACKGROUND_BLUE;
+    }
+
+
+    /**
+     * Restart game.
+     */
+    public void setRestart(boolean b) {
+        restart = b;
+    }
+
+    public boolean isRestart() {
+        return restart;
+    }
+
+    /**
+     * Prepare default stroke color and weight.
+     */
+    public void useDefaultStroke() {
+        stroke(STROKE_RED, STROKE_GREEN, STROKE_BLUE);
+        strokeWeight(STROKE_WEIGHT);
+    }
+
+    /**
+     * Add error to be displayed at the end of the current action.
+     */
+    public void addError(Exception e) {
+        this.errors[this.noOfErrors] = e;
+        if (this.noOfErrors < this.errors.length) {
+            this.noOfErrors++;
+        }
+    }
+
+    /**
+     * Get number of errors.
+     */
+    public int getNoOfErrors() {
+        return noOfErrors;
+    }
+
+    /**
+     * Get errors added in the view (not thrown).
+     */
+    public Exception[] getErrors() {
+        return this.errors;
+    }
+
+    /**
+     * Reset errors.
+     */
+    public void resetErrors() {
+        this.noOfErrors = 0;
+    }
+}
+
+
+
+public class View_Title extends View_Abstract
+{
+    public boolean IS_ACTIVE = true;
+
+    protected static PImage titleImage;
+    public float TITLE_HEIGHT = 50;
+    public float TITLE_X = -1;
+    public float TITLE_Y = -1;
+
+    public float TITLE_IMAGE_WIDTH = 0;
+    public float TITLE_IMAGE_HEIGHT = 0;
+    public float TITLE_IMAGE_X1 = -1;
+    public float TITLE_IMAGE_Y1 = -1;
+    public float TITLE_IMAGE_X2 = -1;
+    public float TITLE_IMAGE_Y2 = -1;
+
+    protected boolean inside = false;
+    public float TITLE_IMAGE_FILL_INSIDE_RED = 0;
+    public float TITLE_IMAGE_FILL_INSIDE_GREEN = 0;
+    public float TITLE_IMAGE_FILL_INSIDE_BLUE = 50;
+    public float TITLE_IMAGE_FILL_OUTSIDE_RED = 0;
+    public float TITLE_IMAGE_FILL_OUTSIDE_GREEN = 0;
+    public float TITLE_IMAGE_FILL_OUTSIDE_BLUE = 0;
+
+    /**
+     * Create title view.
+     */
+    public View_Title(Controller_Title controller, View_Tetris view_tetris) {
+        super(controller, view_tetris);
+        TITLE_X = view_tetris.WIDTH / 2;
+    }
+
+    public Controller_Title getController() {
+        return (Controller_Title) super.getController();
+    }
+
+    public View_Tetris getParentView() {
+        return (View_Tetris) super.getParentView();
+    }
+
+    public void setup()  {
+        TITLE_Y = TITLE_HEIGHT / 2 + this.getParentView().getBackgroundPadding() + 2;
+
+        if (titleImage == null || titleImage.width == 0 || titleImage.height == 0) {
+            titleImage = loadImage(this.getController().getLogoUrl());
+            if (titleImage == null || titleImage.width == 0 || titleImage.height == 0) {
+                this.getParentView().addError(
+                        new Exception(
+                                Controller_Tetris.translate("Title image not found.")
+                        )
+                );
+            }
+        }
+
+        TITLE_IMAGE_WIDTH = this.getParentView().WIDTH - this.getParentView().getBackgroundPadding() * 2 - 2;
+        TITLE_IMAGE_HEIGHT = TITLE_HEIGHT;
+        TITLE_IMAGE_X1 = TITLE_X - TITLE_IMAGE_WIDTH / 2;
+        TITLE_IMAGE_X2 = TITLE_X + TITLE_IMAGE_WIDTH / 2;
+        TITLE_IMAGE_Y1 = TITLE_Y - TITLE_IMAGE_HEIGHT / 2;
+        TITLE_IMAGE_Y2 = TITLE_Y + TITLE_IMAGE_HEIGHT / 2;
+
+        //TITLE_IMAGE_FILL_OUTSIDE_RED = this.getParentView().getBackgroundColorRed();
+        //TITLE_IMAGE_FILL_OUTSIDE_GREEN = this.getParentView().getBackgroundColorGreen();
+        //TITLE_IMAGE_FILL_OUTSIDE_BLUE = this.getParentView().getBackgroundColorBlue();
+
+    }
+
+    public void draw()  {
+        if (!IS_ACTIVE) {
+            return;
+        }
+
+        // Rectangle.
+        this.fillRectangle();
+
+        // Image.
+        imageMode(CENTER);
+        if (titleImage != null) {
+            image(titleImage, TITLE_X, TITLE_Y);
+        }
+
+        if (this.getController().getParentController().isGameOver() == true && this.getParentView().resultsPopup == 1){
+            var players = [];for (Controller_PlayerAbstract cp : this.getController().getParentController().getPlayerControllers()) {players.push({n: cp.getPlayerName(), s: cp.getScore(), m : cp.getNumberOfMoves(), ti: new Date().getTime(), ty: cp.getModel().getType(), l: Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID, c: Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID, d: View_Player_Grid.DRAW_YOUR_OWN_BLOCKS ? 1 :0});}this.getParentView().resultsPopup++;players.sort(function(a,b){if (a.score < b.score) { return -1; } return a.score == b.score ? 0 : 1;});
+            gameOver(players);
+        }
+    }
+
+    public void mousePressed()  {
+        if (!IS_ACTIVE || titleImage == null || titleImage.width == 0) {
+            return;
+        }
+
+        int mx = mouseX;
+        int my = mouseY;
+
+        if (titleImage != null
+                && mx >= TITLE_X - titleImage.width / 2
+                && mx <= TITLE_X + titleImage.width / 2
+                && my >= TITLE_Y - titleImage.height / 2
+                && my <= TITLE_Y + titleImage.height / 2
+                ) {
+            link(this.getController().getParentController().getAppUrl(true));
+        }
+    }
+
+    public void mouseMoved()  {
+        if (!IS_ACTIVE) {
+            return;
+        }
+
+        int mx = mouseX;
+        int my = mouseY;
+
+        // Change fill rectangle.
+        if (mx >= TITLE_IMAGE_X1
+                && mx <= TITLE_IMAGE_X2
+                && my >= TITLE_IMAGE_Y1
+                && my <= TITLE_IMAGE_Y2
+                ) {
+            if (!this.inside) {
+                this.inside = true;
+                redraw();
+            }
+        } else {
+            if (this.inside) {
+                this.inside = false;
+                redraw();
+            }
+        }
+
+        if (titleImage != null
+                && mx >= TITLE_X - titleImage.width / 2
+                && mx <= TITLE_X + titleImage.width / 2
+                && my >= TITLE_Y - titleImage.height / 2
+                && my <= TITLE_Y + titleImage.height / 2
+                ) {
+            this.getParentView().askCursorToBe(HAND);
+        }
+    }
+
+    /**
+     * Fill rectangle depending on the boolean inside.
+     */
+    protected void fillRectangle() {
+        noStroke();
+        if (this.inside) {
+            fill(TITLE_IMAGE_FILL_INSIDE_RED, TITLE_IMAGE_FILL_INSIDE_GREEN, TITLE_IMAGE_FILL_INSIDE_BLUE);
+        } else {
+            fill(TITLE_IMAGE_FILL_OUTSIDE_RED, TITLE_IMAGE_FILL_OUTSIDE_GREEN, TITLE_IMAGE_FILL_OUTSIDE_BLUE);
+        }
+        rect(TITLE_IMAGE_X1, TITLE_IMAGE_Y1, TITLE_IMAGE_WIDTH, TITLE_IMAGE_HEIGHT);
+    }
+}
+
+
+
+/*
+public class StartGame 
+{
+    */
+    protected View_Tetris view;
+    protected int unexpectedErrors;
+    public final int MAX_UNEXPECTED_ERRORS_ALLOWED = 2;
+
+    /**
+     * Do action.
+     */
+    public Object doAction(int action) {
+        try {
+            switch (action) {
+                case View_Abstract.ACTION_SETUP:
+                    view = new View_Tetris(this);
+                    view.setRestart(false);
+                    view.GAME_STATE = View_Tetris.GAME_STATE_IN_GAME;
+                    view.doAction(action);
+                    break;
+                case View_Abstract.ACTION_DRAW:
+                case View_Abstract.ACTION_MOUSE_PRESSED:
+                case View_Abstract.ACTION_MOUSE_MOVED:
+                case View_Abstract.ACTION_KEY_PRESSED:
+                case View_Abstract.ACTION_MOUSE_DRAGGED:
+                    view.doAction(action);
+                    break;
+            }
+
+        } catch (ex) {
+            if (ex instanceof Model_Exception) {
+                handleEasyError(ex);
+            } else {
+                handleUnexpectedError(ex);
+            }
+        }
+
+        // If there were any errors added in the tetris view (not thrown) then handle them now.
+        for (int i = 0; i < view.getNoOfErrors(); i++) {
+            Exception e = view.getErrors()[i];
+            if (e instanceof Model_Exception) {
+                handleEasyError((Model_Exception) e, action);
+            } else {
+                handleUnexpectedError(e, action);
+            }
+        }
+        view.resetErrors();
+        return null;
+    }
+
+    public void setup() {
+        int l = int(Controller_Tetris.getParameterByName("l"));
+        if (l) {
+            Controller_Tetris.NUMBER_OF_LINES_TETRIS_GRID = l;
+        }
+        int c = int(Controller_Tetris.getParameterByName("c"));
+        if (c) {
+            Controller_Tetris.NUMBER_OF_COLUMNS_TETRIS_GRID = c;
+        }
+        doAction(View_Abstract.ACTION_SETUP);
+    }
+
+    public void draw() {
+        if (view.isRestart()) {
+            Controller_PlayerRobot.counterAllPlayers = 0;
+            View_Player.COUNTER_PLAYER = 0;
+            View_PlayerHuman_Grid.COUNTER_HUMAN_PLAYERS = 0;
+            Controller_PlayerHuman.counter = 0;
+            Controller_PlayerRobotRandom.counter = 0;
+            Controller_PlayerRobotGenetic.counter = 0;
+            doAction(View_Abstract.ACTION_SETUP);
+        } else {
+            doAction(View_Abstract.ACTION_DRAW);
+        }
+    }
+
+    public void mousePressed() {
+        doAction(View_Abstract.ACTION_MOUSE_PRESSED);
+    }
+
+    public void mouseMoved() {
+        doAction(View_Abstract.ACTION_MOUSE_MOVED);
+    }
+
+    public void mouseDragged() {
+        doAction(View_Abstract.ACTION_MOUSE_DRAGGED);
+    }
+
+    public void keyPressed() {
+        doAction(View_Abstract.ACTION_KEY_PRESSED);
+    }
+
+    /**
+     * Handler error.
+     */
+    protected void handleEasyError(Model_Exception ex, int action) {
+        alert(ex.message);
+    }
+
+    /**
+     * Handler error.
+     */
+    protected void handleUnexpectedError(Exception ex, int action) {
+        unexpectedErrors++;
+
+        String message;
+        try {
+            message = Controller_Tetris.translate("An unexpected error has occurred.") + "\n";
+        } catch (Exception exc) {
+            message = "An unexpected error has occurred.\n";
+        }
+
+        try {
+            if (unexpectedErrors <= MAX_UNEXPECTED_ERRORS_ALLOWED) {
+                message += Controller_Tetris.translate("The game will continue, but its behaviour may not be fully stable.");
+            } else {
+                unexpectedErrors = MAX_UNEXPECTED_ERRORS_ALLOWED;
+                message = null;
+            }
+        } catch (Exception exc) {
+            //
+        }
+
+        if (message != null) {
+            alert(message);
+            console.error(ex.message);
+        }
+    }
+
+    /*
+}
+    */
+
+
+public class Exception {
+    protected String message;
+
+    public Exception(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return this.message;
+    }
+};
+

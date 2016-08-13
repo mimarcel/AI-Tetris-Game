@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <!-- charset must remain utf-8 to be handled properly by Processing -->
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <title>Tetris : Built with Processing</title>
+
+    <style type="text/css">
+      /* <![CDATA[ */
+	
+	body {
+  	  margin: 60px 0px 0px 55px;
+	  font-family: verdana, geneva, arial, helvetica, sans-serif; 
+	  font-size: 11px; 
+	  background-color: #ddddcc; 
+	  text-decoration: none; 
+	  font-weight: normal; 
+	  line-height: normal; 
+	}
+		 
+	a          { color: #3399cc; }
+	a:link     { color: #3399cc; text-decoration: underline; }
+	a:visited  { color: #3399cc; text-decoration: underline; }
+	a:active   { color: #3399cc; text-decoration: underline; }
+	a:hover    { color: #3399cc; text-decoration: underline; }
+
+      /* ]]> */
+    </style>    
+  </head>
+
+  <body>
+    <div id="content">
+      <div id="Tetris_container">
+
+	<!-- This version plays nicer with older browsers, 
+	     but requires JavaScript to be enabled. 
+	     http://java.sun.com/javase/6/docs/technotes/guides/jweb/deployment_advice.html
+	     http://download.oracle.com/javase/tutorial/deployment/deploymentInDepth/ -->
+	<script type="text/javascript"
+		src="http://www.java.com/js/deployJava.js"></script>
+	<script type="text/javascript">
+	  /* <![CDATA[ */
+
+	  var attributes = { 
+            code: 'Tetris.class',
+            archive: 'Tetris.jar',
+            width: 900, 
+            height: 600,
+          };
+          var parameters = { 
+            image: 'loading.gif',
+            centerimage: 'true',
+          };
+          var version = '1.5';
+          deployJava.runApplet(attributes, parameters, version);
+
+          /* ]]> */
+        </script>
+        
+	<noscript> <div>
+	  <!--[if !IE]> -->
+	  <object classid="java:Tetris.class" 
+            	  type="application/x-java-applet"
+            	  archive="Tetris.jar"
+            	  width="100" height="100"
+            	  standby="Loading Processing software..." >
+            
+	    <param name="archive" value="Tetris.jar" />
+	    
+	    <param name="mayscript" value="true" />
+	    <param name="scriptable" value="true" />
+	    
+	    <param name="image" value="loading.gif" />
+	    <param name="boxmessage" value="Loading Processing software..." />
+	    <param name="boxbgcolor" value="#FFFFFF" />
+	  <!--<![endif]-->
+
+	    <!-- For more instructions on deployment, 
+		 or to update the CAB file listed here, see:
+		 http://java.sun.com/javase/6/webnotes/family-clsid.html
+		 http://java.sun.com/javase/6/webnotes/install/jre/autodownload.html -->
+	    <object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93"
+		    codebase="http://java.sun.com/update/1.6.0/jinstall-6u20-windows-i586.cab"
+		    width="100" height="100"
+		    standby="Loading Processing software..."  >
+	      
+	      <param name="code" value="Tetris" />
+	      <param name="archive" value="Tetris.jar" />
+	      
+	      <param name="mayscript" value="true" />
+	      <param name="scriptable" value="true" />
+	      
+	      <param name="image" value="loading.gif" />
+	      <param name="boxmessage" value="Loading Processing software..." />
+	      <param name="boxbgcolor" value="#FFFFFF" />
+	      
+	      <p>
+		<strong>
+		  This browser does not have a Java Plug-in.
+		  <br />
+		  <a href="http://www.java.com/getjava" title="Download Java Plug-in">
+		    Get the latest Java Plug-in here.
+		  </a>
+		</strong>
+	      </p>
+	      
+	    </object>
+	    
+	  <!--[if !IE]> -->
+	  </object>
+	  <!--<![endif]-->
+
+	</div> </noscript>
+
+      </div>
+      
+      <p>
+	Source code: <a href="Tetris.pde">Tetris</a> <a href="Controller.java">Controller</a> <a href="Controller_Abstract.java">Controller_Abstract</a> <a href="Controller_Background.java">Controller_Background</a> <a href="Controller_Language.java">Controller_Language</a> <a href="Controller_PlayerAbstract.java">Controller_PlayerAbstract</a> <a href="Controller_PlayerHuman.java">Controller_PlayerHuman</a> <a href="Controller_PlayerHuman_Grid.java">Controller_PlayerHuman_Grid</a> <a href="Controller_PlayerHuman_Legend.java">Controller_PlayerHuman_Legend</a> <a href="Controller_PlayerRobot.java">Controller_PlayerRobot</a> <a href="Controller_PlayerRobotGenetic.java">Controller_PlayerRobotGenetic</a> <a href="Controller_PlayerRobotGenetic_Grid.java">Controller_PlayerRobotGenetic_Grid</a> <a href="Controller_PlayerRobotRandom.java">Controller_PlayerRobotRandom</a> <a href="Controller_PlayerRobotRandom_Grid.java">Controller_PlayerRobotRandom_Grid</a> <a href="Controller_Player_Grid.java">Controller_Player_Grid</a> <a href="Controller_Player_Info.java">Controller_Player_Info</a> <a href="Controller_Player_Next.java">Controller_Player_Next</a> <a href="Controller_Player_Score.java">Controller_Player_Score</a> <a href="Controller_Restart.java">Controller_Restart</a> <a href="Controller_Tetris.java">Controller_Tetris</a> <a href="Controller_Title.java">Controller_Title</a> <a href="Controller_Translator.java">Controller_Translator</a> <a href="Model.java">Model</a> <a href="Model_Abstract.java">Model_Abstract</a> <a href="Model_Collection.java">Model_Collection</a> <a href="Model_Collection_Abstract.java">Model_Collection_Abstract</a> <a href="Model_Color.java">Model_Color</a> <a href="Model_Exception.java">Model_Exception</a> <a href="Model_Language.java">Model_Language</a> <a href="Model_Language_Collection.java">Model_Language_Collection</a> <a href="Model_Logger.java">Model_Logger</a> <a href="Model_LoggerTetris.java">Model_LoggerTetris</a> <a href="Model_Player.java">Model_Player</a> <a href="Model_PlayerAbstract.java">Model_PlayerAbstract</a> <a href="Model_PlayerHuman.java">Model_PlayerHuman</a> <a href="Model_PlayerRobot.java">Model_PlayerRobot</a> <a href="Model_PlayerRobotGenetic.java">Model_PlayerRobotGenetic</a> <a href="Model_PlayerRobotGenetic_EvaluationFunction.java">Model_PlayerRobotGenetic_EvaluationFunction</a> <a href="Model_PlayerRobotGenetic_EvaluationFunctionEvolved.java">Model_PlayerRobotGenetic_EvaluationFunctionEvolved</a> <a href="Model_PlayerRobotRandom.java">Model_PlayerRobotRandom</a> <a href="Model_Player_Factory.java">Model_Player_Factory</a> <a href="Model_Tetris.java">Model_Tetris</a> <a href="Model_Tetromino.java">Model_Tetromino</a> <a href="Model_Tetromino_Factory.java">Model_Tetromino_Factory</a> <a href="Model_Translator.java">Model_Translator</a> <a href="View.java">View</a> <a href="View_Abstract.java">View_Abstract</a> <a href="View_AbstractWithChildren.java">View_AbstractWithChildren</a> <a href="View_Background.java">View_Background</a> <a href="View_Language.java">View_Language</a> <a href="View_Player.java">View_Player</a> <a href="View_PlayerHuman.java">View_PlayerHuman</a> <a href="View_PlayerHuman_Grid.java">View_PlayerHuman_Grid</a> <a href="View_PlayerHuman_Legend.java">View_PlayerHuman_Legend</a> <a href="View_PlayerRobot.java">View_PlayerRobot</a> <a href="View_PlayerRobotGenetic.java">View_PlayerRobotGenetic</a> <a href="View_PlayerRobotGenetic_Grid.java">View_PlayerRobotGenetic_Grid</a> <a href="View_PlayerRobotRandom.java">View_PlayerRobotRandom</a> <a href="View_PlayerRobotRandom_Grid.java">View_PlayerRobotRandom_Grid</a> <a href="View_Player_Grid.java">View_Player_Grid</a> <a href="View_Player_Info.java">View_Player_Info</a> <a href="View_Player_Next.java">View_Player_Next</a> <a href="View_Player_Score.java">View_Player_Score</a> <a href="View_Restart.java">View_Restart</a> <a href="View_Tetris.java">View_Tetris</a> <a href="View_Title.java">View_Title</a> 
+      </p>
+      
+      <p>
+	Built with <a href="http://processing.org" title="Processing.org">Processing</a>
+      </p>
+    </div>
+  </body>
+</html>

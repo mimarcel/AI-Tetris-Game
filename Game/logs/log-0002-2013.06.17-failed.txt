@@ -1,0 +1,619 @@
+START Training
+
+MAX_NUMBER_OF_GENERATIONS = 1000
+NUMBER_OF_PLAYERS = 10
+NUMBER_OF_GAME_MANAGERS_THREADS = 4
+WEIGHT_MIN = -5.0
+WEIGHT_MAX = 5.0
+Controller_PlayerRobotGenetic.EVALUATION_CURRENT_GRID_IMPORTANCE = 0.5
+Controller_PlayerRobotGenetic.EVALUATION_NEXT_TETROMINO_IMPORTANCE = 0.25
+Controller_PlayerRobotGenetic.EVALUATION_ALL_TETROMINOES_IMPORTANCE = 0.25
+Controller_PlayerRobotGenetic.ACCURACY_HOW_MANY_POSITIONS_TO_CHECK_IN_ADVANCE_PERCENTAGE = 0.0
+MAX_NUMBER_OF_PLAYERS_TO_SELECT_FOR_MUTATION = 1
+MAX_NUMBER_OF_PLAYERS_TO_SELECT_FOR_CROSSOVER_AND_MUTATION = 2
+MAX_NUMBER_OF_PLAYERS_TO_SELECT_FOR_CROSSOVER = 2
+MUTATION_PROBABILITY_TO_ALLOW_CHILD_TO_GO_TO_NEXT_GENERATION_EVEN_IF_WEAKER = 0.2
+CROSSOVER_PROBABILITY_TO_ALLOW_CHILD_TO_GO_TO_NEXT_GENERATION_EVEN_IF_WEAKER = 0.2
+CROSSOVER_MUTATION_PROBABILITY_TO_ALLOW_CHILD_TO_GO_TO_NEXT_GENERATION_EVEN_IF_WEAKER = 0.2
+TIME_TO_LOG_PROGRESS = 30000
+WEIGHT_MAX_TO_CHANGE_ON_MUTATION = 0.5
+MUTATION_TYPE_UNIFORM_PROBABILITY = 0.4
+CROSSOVER_TYPE_INTERMEDIATE_ALPHA = 0.3
+MUTATION_TYPE_DEFAULT = Uniform mutation
+CROSSOVER_TYPE_DEFAULT = Intermediate complete crossover
+
+######################################################
+Generation 1 START
+######################################################
+
+[2013.06.17 15:30:43 Generation #1]
+0 chromosomes replaced through mutation so far
+0 chromosomes replaced through crossover&mutation so far
+0 chromosomes replaced through crossover so far
+
+--Mutation phase--
+
+[2013.06.17 15:30:43 Generation #1 - Mutation chromosome 9]
+Mutation (0.0 0.0 0.0 0.0 0.0 0.0 ) in (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 )
+
+[2013.06.17 15:31:13 Generation #1 - Mutation chromosome 9 - Move #58 - Mutant Chromosome 9]
+
+[2013.06.17 15:31:21 Generation #1 - Mutation chromosome 9]
+Game over for all players!
+    0 - Chromosome 9 - 17 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Mutant Chromosome 9 - 72 moves - score 15 - 10.0 (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 )
+1 chromosomes replaced through mutation.
+
+--Crossover & Mutation phase--
+
+[2013.06.17 15:31:21 Generation #1 - Crossover&Mutation chromosome 1]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0  => 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0 
+
+[2013.06.17 15:31:21 Generation #1 - Crossover&Mutation chromosome 1]
+Mutation (0.0 0.0 0.0 0.0 0.0 0.0 ) in (0.0 0.0 4.198330485729086 0.0 0.0 0.0 )
+
+[2013.06.17 15:31:21 Generation #1 - Crossover&Mutation chromosome 1]
+Mutation (0.0 0.0 0.0 0.0 0.0 0.0 ) in (0.6493466754106283 0.0 0.0 0.0 0.0 0.0 )
+
+
+[2013.06.17 15:31:40 Generation #1 - Crossover&Mutation chromosome 2]
+Game over for all players!
+    0 - Mutant Chromosome Child 1 - 15 moves - score 0 - 9.0 (-2.6956415801862943 3.302867015227834 0.0 0.0 -0.4962131109915511 -3.7209381801437615 )
+    1 - Chromosome Parent 2  - 16 moves - score 0 - 9.333333333333334 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Mutant Chromosome Child 2 - 17 moves - score 0 - 9.666666666666666 (0.0 4.521959580629041 0.0 0.0 2.232156501686876 0.0 )
+    3 - Chromosome Parent 1  - 18 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+0 chromosomes replaced through crossover&mutation.
+
+--Crossover phase--
+
+[2013.06.17 15:31:40 Generation #1 - Crossover chromosome 3]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0  => 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0 
+
+[2013.06.17 15:31:43 Generation #1 - Crossover chromosome 3 - Move #8 - Chromosome Child 2]
+
+[2013.06.17 15:31:49 Generation #1 - Crossover chromosome 3]
+Game over for all players!
+    0 - Chromosome Child 1 - 12 moves - score 0 - 9.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Chromosome Child 2 - 12 moves - score 0 - 9.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Chromosome Parent 1  - 19 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    3 - Chromosome Parent 2  - 19 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+
+[2013.06.17 15:31:49 Generation #1 - Crossover chromosome 4]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0  => 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0 
+
+
+[2013.06.17 15:31:57 Generation #1 - Crossover chromosome 4]
+Game over for all players!
+    0 - Chromosome Parent 1  - 15 moves - score 0 - 9.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Chromosome Parent 2  - 16 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Chromosome Child 1 - 16 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    3 - Chromosome Child 2 - 16 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+1 chromosomes replaced through crossover.
+
+[2013.06.17 15:32:13 Generation #1 - Move #30 - Robot Genetic 10]
+
+[2013.06.17 15:32:31 Generation #1]
+Game over for all players!
+    0 - Robot Genetic 2 - 16 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Robot Genetic 4 - 16 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Robot Genetic 5 - 16 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    3 - Robot Genetic 6 - 16 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    4 - Robot Genetic 7 - 16 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    5 - Robot Genetic 8 - 16 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    6 - Robot Genetic 9 - 16 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    7 - Robot Genetic 10 - 16 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    8 - Robot Genetic 3 - 22 moves - score 0 - 0.125 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    9 - Robot Genetic - 64 moves - score 12 - 10.0 (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 )
+
+######################################################
+Generation 1 STOP
+######################################################
+
+######################################################
+Generation 2 START
+######################################################
+
+[2013.06.17 15:32:31 Generation #2]
+1 chromosomes replaced through mutation so far
+0 chromosomes replaced through crossover&mutation so far
+1 chromosomes replaced through crossover so far
+
+--Mutation phase--
+
+[2013.06.17 15:32:31 Generation #2 - Mutation chromosome 9]
+Mutation (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 ) in (-0.6214021606275821 0.0 0.0 -1.544618365196102 0.0 0.0 )
+
+[2013.06.17 15:32:43 Generation #2 - Mutation chromosome 9 - Move #26 - Mutant Chromosome 9]
+
+[2013.06.17 15:33:09 Generation #2 - Mutation chromosome 9]
+Game over for all players!
+    0 - Mutant Chromosome 9 - 15 moves - score 0 - 0.0 (-0.6214021606275821 0.0 0.0 -1.544618365196102 0.0 0.0 )
+    1 - Chromosome 9 - 76 moves - score 15 - 10.0 (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 )
+1 chromosomes replaced through mutation.
+
+--Crossover & Mutation phase--
+
+[2013.06.17 15:33:09 Generation #2 - Crossover&Mutation chromosome 1]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0  => 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0 
+
+[2013.06.17 15:33:09 Generation #2 - Crossover&Mutation chromosome 1]
+Mutation (0.0 0.0 0.0 0.0 0.0 0.0 ) in (0.0 0.0 0.0 0.0 0.0 0.0 )
+
+[2013.06.17 15:33:09 Generation #2 - Crossover&Mutation chromosome 1]
+Mutation (0.0 0.0 0.0 0.0 0.0 0.0 ) in (-4.537240704720556 0.0 3.1203778633941965 0.0 0.0 0.0 )
+
+[2013.06.17 15:33:13 Generation #2 - Crossover&Mutation chromosome 1 - Move #10 - Mutant Chromosome Child 2]
+[2013.06.17 15:33:43 Generation #2 - Crossover&Mutation chromosome 2 - Move #36 - Mutant Chromosome Child 2]
+
+[2013.06.17 15:33:52 Generation #2 - Crossover chromosome 3]
+Game over for all players!
+    0 - Chromosome Parent 1  - 12 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Chromosome Parent 2  - 12 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Chromosome Child 1 - 12 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    3 - Chromosome Child 2 - 12 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+
+[2013.06.17 15:33:52 Generation #2 - Crossover chromosome 4]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0  => 0.0 0.0 0.0 0.0 0.0 0.0  and 0.0 0.0 0.0 0.0 0.0 0.0 
+
+
+[2013.06.17 15:33:59 Generation #2 - Crossover chromosome 4]
+Game over for all players!
+    0 - Chromosome Parent 2  - 13 moves - score 0 - 9.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Chromosome Child 2 - 13 moves - score 0 - 9.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Chromosome Parent 1  - 15 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    3 - Chromosome Child 1 - 15 moves - score 0 - 10.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+0 chromosomes replaced through crossover.
+
+[2013.06.17 15:34:13 Generation #2 - Move #22 - Robot Genetic 10]
+[2013.06.17 15:34:43 Generation #2 - Move #82 - Robot Genetic 10]
+
+[2013.06.17 15:34:48 Generation #2]
+Game over for all players!
+    0 - Robot Genetic - 15 moves - score 0 - 0.0 (-0.6214021606275821 0.0 0.0 -1.544618365196102 0.0 0.0 )
+    1 - Robot Genetic 4 - 20 moves - score 0 - 0.06666666666666667 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Robot Genetic 5 - 20 moves - score 0 - 0.06666666666666667 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    3 - Robot Genetic 6 - 20 moves - score 0 - 0.06666666666666667 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    4 - Robot Genetic 7 - 20 moves - score 0 - 0.06666666666666667 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    5 - Robot Genetic 8 - 20 moves - score 0 - 0.06666666666666667 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    6 - Robot Genetic 9 - 20 moves - score 0 - 0.06666666666666667 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    7 - Robot Genetic 2 - 33 moves - score 0 - 0.24 (-4.537240704720556 0.0 3.1203778633941965 0.0 0.0 0.0 )
+    8 - Robot Genetic 3 - 43 moves - score 4 - 2.0876190476190475 (-1.8891442610182274 0.0 -4.632306529877281 0.0 0.0 0.0 )
+    9 - Robot Genetic 10 - 90 moves - score 21 - 10.0 (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 )
+
+######################################################
+Generation 2 STOP
+######################################################
+
+######################################################
+Generation 3 START
+######################################################
+
+[2013.06.17 15:34:48 Generation #3]
+2 chromosomes replaced through mutation so far
+2 chromosomes replaced through crossover&mutation so far
+1 chromosomes replaced through crossover so far
+
+--Mutation phase--
+
+[2013.06.17 15:34:48 Generation #3 - Mutation chromosome 9]
+Mutation (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 ) in (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 )
+
+[2013.06.17 15:35:13 Generation #3 - Mutation chromosome 9 - Move #51 - Mutant Chromosome 9]
+[2013.06.17 15:35:43 Generation #3 - Crossover&Mutation chromosome 1 - Move #7 - Mutant Chromosome Child 2]
+
+[2013.06.17 15:35:51 Generation #3 - Crossover&Mutation chromosome 1]
+Game over for all players!
+    0 - Chromosome Parent 1  - 17 moves - score 0 - 9.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Mutant Chromosome Child 2 - 17 moves - score 0 - 9.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Chromosome Parent 2  - 19 moves - score 0 - 9.4 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    3 - Mutant Chromosome Child 1 - 22 moves - score 0 - 10.0 (0.0 -3.036659578263232 0.3018958550944637 0.9599253046161218 -3.659894160570097 0.0 )
+
+[2013.06.17 15:35:51 Generation #3 - Crossover&Mutation chromosome 2]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and -4.537240704720556 0.0 3.1203778633941965 0.0 0.0 0.0  => -3.1760684933043892 0.0 2.184264504375937 0.0 0.0 0.0  and -1.3611722114161668 0.0 0.9361133590182589 0.0 0.0 0.0 
+
+[2013.06.17 15:35:51 Generation #3 - Crossover&Mutation chromosome 2]
+Mutation (-3.1760684933043892 0.0 2.184264504375937 0.0 0.0 0.0 ) in (3.2762844848223516 4.971650801463561 2.184264504375937 4.719152658795606 -2.285420130960285 0.0 )
+
+[2013.06.17 15:35:51 Generation #3 - Crossover&Mutation chromosome 2]
+Mutation (-1.3611722114161668 0.0 0.9361133590182589 0.0 0.0 0.0 ) in (-1.0063126194163328 0.0 3.666048890372627 0.0 0.0 3.8520641969183256 )
+
+[2013.06.17 15:36:13 Generation #3 - Crossover chromosome 3 - Move #12 - Chromosome Child 2]
+
+[2013.06.17 15:36:40 Generation #3 - Crossover chromosome 4]
+Game over for all players!
+    0 - Chromosome Parent 1  - 16 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Chromosome Parent 2  - 51 moves - score 8 - 10.0 (-1.8891442610182274 0.0 -4.632306529877281 0.0 0.0 0.0 )
+    2 - Chromosome Child 1 - 51 moves - score 8 - 10.0 (-1.3224009827127592 0.0 -3.242614570914097 0.0 0.0 0.0 )
+    3 - Chromosome Child 2 - 51 moves - score 8 - 10.0 (-0.5667432783054682 0.0 -1.3896919589631844 0.0 0.0 0.0 )
+1 chromosomes replaced through crossover.
+
+[2013.06.17 15:36:43 Generation #3 - Move #5 - Robot Genetic 10]
+[2013.06.17 15:37:13 Generation #3 - Move #61 - Robot Genetic 10]
+
+[2013.06.17 15:37:25 Generation #3]
+Game over for all players!
+    0 - Robot Genetic - 20 moves - score 0 - 0.0 (-0.6214021606275821 0.0 0.0 -1.544618365196102 0.0 0.0 )
+    1 - Robot Genetic 2 - 22 moves - score 0 - 0.03125 (0.0 -3.036659578263232 0.3018958550944637 0.9599253046161218 -3.659894160570097 0.0 )
+    2 - Robot Genetic 4 - 23 moves - score 0 - 0.046875 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    3 - Robot Genetic 6 - 23 moves - score 0 - 0.046875 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    4 - Robot Genetic 7 - 23 moves - score 0 - 0.046875 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    5 - Robot Genetic 3 - 31 moves - score 0 - 0.171875 (-1.0063126194163328 0.0 3.666048890372627 0.0 0.0 3.8520641969183256 )
+    6 - Robot Genetic 8 - 34 moves - score 0 - 0.21875 (-4.537240704720556 0.0 3.1203778633941965 0.0 0.0 0.0 )
+    7 - Robot Genetic 5 - 71 moves - score 17 - 9.296875 (-0.5667432783054682 0.0 -1.3896919589631844 0.0 0.0 0.0 )
+    8 - Robot Genetic 9 - 71 moves - score 17 - 9.296875 (-1.8891442610182274 0.0 -4.632306529877281 0.0 0.0 0.0 )
+    9 - Robot Genetic 10 - 84 moves - score 18 - 10.0 (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 )
+
+######################################################
+Generation 3 STOP
+######################################################
+
+######################################################
+Generation 4 START
+######################################################
+
+[2013.06.17 15:37:25 Generation #4]
+2 chromosomes replaced through mutation so far
+4 chromosomes replaced through crossover&mutation so far
+2 chromosomes replaced through crossover so far
+
+--Mutation phase--
+
+[2013.06.17 15:37:25 Generation #4 - Mutation chromosome 9]
+Mutation (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 ) in (0.7757721567107145 0.0 0.0 0.0 0.0 0.0 )
+
+[2013.06.17 15:37:43 Generation #4 - Mutation chromosome 9 - Move #37 - Mutant Chromosome 9]
+
+[2013.06.17 15:37:55 Generation #4 - Mutation chromosome 9]
+Game over for all players!
+    0 - Mutant Chromosome 9 - 11 moves - score 0 - 0.0 (0.7757721567107145 0.0 0.0 0.0 0.0 0.0 )
+    1 - Chromosome 9 - 59 moves - score 9 - 10.0 (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 )
+0 chromosomes replaced through mutation.
+
+--Crossover & Mutation phase--
+
+[2013.06.17 15:37:55 Generation #4 - Crossover&Mutation chromosome 1]
+Crossover 0.0 -3.036659578263232 0.3018958550944637 0.9599253046161218 -3.659894160570097 0.0  and -1.8891442610182274 0.0 -4.632306529877281 0.0 0.0 0.0  => -1.3224009827127592 -0.9109978734789697 -3.1520458143857577 0.28797759138483653 -1.0979682481710291 0.0  and -0.5667432783054682 -2.1256617047842625 -1.1783648603970598 0.6719477132312852 -2.561925912399068 0.0 
+
+[2013.06.17 15:37:55 Generation #4 - Crossover&Mutation chromosome 1]
+Mutation (-1.3224009827127592 -0.9109978734789697 -3.1520458143857577 0.28797759138483653 -1.0979682481710291 0.0 ) in (-4.775063547985422 3.9160854052807963 -3.1520458143857577 -3.201815278410759 -1.0979682481710291 2.4175889683422946 )
+
+[2013.06.17 15:37:55 Generation #4 - Crossover&Mutation chromosome 1]
+Mutation (-0.5667432783054682 -2.1256617047842625 -1.1783648603970598 0.6719477132312852 -2.561925912399068 0.0 ) in (-0.5667432783054682 -2.1256617047842625 4.616177154383189 0.6719477132312852 -2.561925912399068 0.0 )
+
+[2013.06.17 15:38:13 Generation #4 - Crossover&Mutation chromosome 1 - Move #38 - Mutant Chromosome Child 2]
+
+[2013.06.17 15:38:21 Generation #4 - Crossover&Mutation chromosome 1]
+Game over for all players!
+    0 - Chromosome Parent 1  - 13 moves - score 0 - 0.0 (0.0 -3.036659578263232 0.3018958550944637 0.9599253046161218 -3.659894160570097 0.0 )
+    1 - Mutant Chromosome Child 2 - 13 moves - score 0 - 0.0 (-0.5667432783054682 -2.1256617047842625 4.616177154383189 0.6719477132312852 -2.561925912399068 0.0 )
+    2 - Mutant Chromosome Child 1 - 14 moves - score 0 - 0.02564102564102564 (-4.775063547985422 3.9160854052807963 -3.1520458143857577 -3.201815278410759 -1.0979682481710291 2.4175889683422946 )
+    3 - Chromosome Parent 2  - 52 moves - score 6 - 10.0 (-1.8891442610182274 0.0 -4.632306529877281 0.0 0.0 0.0 )
+
+[2013.06.17 15:38:21 Generation #4 - Crossover&Mutation chromosome 2]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and -4.537240704720556 0.0 3.1203778633941965 0.0 0.0 0.0  => -3.1760684933043892 0.0 2.184264504375937 0.0 0.0 0.0  and -1.3611722114161668 0.0 0.9361133590182589 0.0 0.0 0.0 
+
+[2013.06.17 15:38:21 Generation #4 - Crossover&Mutation chromosome 2]
+Mutation (-3.1760684933043892 0.0 2.184264504375937 0.0 0.0 0.0 ) in (-3.1760684933043892 0.0 2.445068775034799 4.359519142219252 -4.166274336843895 0.0 )
+
+[2013.06.17 15:38:21 Generation #4 - Crossover&Mutation chromosome 2]
+Mutation (-1.3611722114161668 0.0 0.9361133590182589 0.0 0.0 0.0 ) in (-1.3611722114161668 0.0 0.9361133590182589 4.983454377508139 -3.517364699041887 1.085990085516272 )
+
+
+[2013.06.17 15:38:37 Generation #4 - Crossover&Mutation chromosome 2]
+Game over for all players!
+    0 - Mutant Chromosome Child 2 - 13 moves - score 0 - 9.0 (-1.3611722114161668 0.0 0.9361133590182589 4.983454377508139 -3.517364699041887 1.085990085516272 )
+    1 - Chromosome Parent 1  - 15 moves - score 0 - 9.1 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    2 - Mutant Chromosome Child 1 - 16 moves - score 0 - 9.15 (-3.1760684933043892 0.0 2.445068775034799 4.359519142219252 -4.166274336843895 0.0 )
+    3 - Chromosome Parent 2  - 33 moves - score 0 - 10.0 (-4.537240704720556 0.0 3.1203778633941965 0.0 0.0 0.0 )
+2 chromosomes replaced through crossover&mutation.
+
+--Crossover phase--
+
+[2013.06.17 15:38:37 Generation #4 - Crossover chromosome 3]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and -1.8891442610182274 0.0 -4.632306529877281 0.0 0.0 0.0  => -1.3224009827127592 0.0 -3.242614570914097 0.0 0.0 0.0  and -0.5667432783054682 0.0 -1.3896919589631844 0.0 0.0 0.0 
+
+[2013.06.17 15:38:43 Generation #4 - Crossover chromosome 3 - Move #13 - Chromosome Child 2]
+
+[2013.06.17 15:39:11 Generation #4 - Crossover chromosome 3]
+Game over for all players!
+    0 - Chromosome Parent 1  - 21 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Chromosome Parent 2  - 39 moves - score 3 - 2.3198757763975157 (-1.8891442610182274 0.0 -4.632306529877281 0.0 0.0 0.0 )
+    2 - Chromosome Child 1 - 67 moves - score 14 - 10.0 (-1.3224009827127592 0.0 -3.242614570914097 0.0 0.0 0.0 )
+    3 - Chromosome Child 2 - 67 moves - score 14 - 10.0 (-0.5667432783054682 0.0 -1.3896919589631844 0.0 0.0 0.0 )
+
+[2013.06.17 15:39:11 Generation #4 - Crossover chromosome 4]
+Crossover 0.0 0.0 0.0 0.0 0.0 0.0  and -2.55880198309526 0.0 0.0 0.0 0.0 0.0  => -1.791161388166682 0.0 0.0 0.0 0.0 0.0  and -0.7676405949285781 0.0 0.0 0.0 0.0 0.0 
+
+[2013.06.17 15:39:13 Generation #4 - Crossover chromosome 4 - Move #6 - Chromosome Child 2]
+[2013.06.17 15:39:43 Generation #4 - Crossover chromosome 4 - Move #66 - Chromosome Child 2]
+
+[2013.06.17 15:39:55 Generation #4 - Crossover chromosome 4]
+Game over for all players!
+    0 - Chromosome Parent 1  - 20 moves - score 0 - 0.0 (0.0 0.0 0.0 0.0 0.0 0.0 )
+    1 - Chromosome Parent 2  - 59 moves - score 8 - 3.846256684491979 (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 )
+    2 - Chromosome Child 1 - 59 moves - score 8 - 3.846256684491979 (-1.791161388166682 0.0 0.0 0.0 0.0 0.0 )
+    3 - Chromosome Child 2 - 88 moves - score 22 - 10.0 (-0.7676405949285781 0.0 0.0 0.0 0.0 0.0 )
+2 chromosomes replaced through crossover.
+
+[2013.06.17 15:40:13 Generation #4 - Move #28 - Robot Genetic 10]
+[2013.06.17 15:40:43 Generation #4 - Move #88 - Robot Genetic 10]
+
+[2013.06.17 15:41:03 Generation #4]
+Game over for all players!
+    0 - Robot Genetic 2 - 15 moves - score 0 - 0.0 (-4.775063547985422 3.9160854052807963 -3.1520458143857577 -3.201815278410759 -1.0979682481710291 2.4175889683422946 )
+    1 - Robot Genetic - 16 moves - score 0 - 0.008928571428571428 (-0.6214021606275821 0.0 0.0 -1.544618365196102 0.0 0.0 )
+    2 - Robot Genetic 3 - 18 moves - score 0 - 0.026785714285714284 (-3.1760684933043892 0.0 2.445068775034799 4.359519142219252 -4.166274336843895 0.0 )
+    3 - Robot Genetic 6 - 29 moves - score 0 - 0.125 (-1.0063126194163328 0.0 3.666048890372627 0.0 0.0 3.8520641969183256 )
+    4 - Robot Genetic 7 - 32 moves - score 0 - 0.15178571428571427 (-4.537240704720556 0.0 3.1203778633941965 0.0 0.0 0.0 )
+    5 - Robot Genetic 4 - 87 moves - score 22 - 5.994208494208495 (-0.5667432783054682 0.0 -1.3896919589631844 0.0 0.0 0.0 )
+    6 - Robot Genetic 8 - 87 moves - score 22 - 5.994208494208495 (-0.5667432783054682 0.0 -1.3896919589631844 0.0 0.0 0.0 )
+    7 - Robot Genetic 9 - 87 moves - score 22 - 5.994208494208495 (-1.8891442610182274 0.0 -4.632306529877281 0.0 0.0 0.0 )
+    8 - Robot Genetic 5 - 127 moves - score 37 - 10.0 (-0.7676405949285781 0.0 0.0 0.0 0.0 0.0 )
+    9 - Robot Genetic 10 - 127 moves - score 37 - 10.0 (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 )
+
+######################################################
+Generation 4 STOP
+######################################################
+
+######################################################
+Generation 5 START
+######################################################
+
+[2013.06.17 15:41:03 Generation #5]
+2 chromosomes replaced through mutation so far
+6 chromosomes replaced through crossover&mutation so far
+4 chromosomes replaced through crossover so far
+
+--Mutation phase--
+
+[2013.06.17 15:41:03 Generation #5 - Mutation chromosome 9]
+Mutation (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 ) in (-2.55880198309526 -1.9324024569740148 -4.551355740961716 0.0 0.0 0.0 )
+
+[2013.06.17 15:41:13 Generation #5 - Mutation chromosome 9 - Move #21 - Mutant Chromosome 9]
+
+[2013.06.17 15:41:40 Generation #5 - Mutation chromosome 9]
+Game over for all players!
+    0 - Chromosome 9 - 73 moves - score 14 - 1.0 (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 )
+    1 - Mutant Chromosome 9 - 63 moves - score 16 - 9.0 (-2.55880198309526 -1.9324024569740148 -4.551355740961716 0.0 0.0 0.0 )
+1 chromosomes replaced through mutation.
+
+--Crossover & Mutation phase--
+
+[2013.06.17 15:41:40 Generation #5 - Crossover&Mutation chromosome 1]
+Crossover -0.6214021606275821 0.0 0.0 -1.544618365196102 0.0 0.0  and -0.7676405949285781 0.0 0.0 0.0 0.0 0.0  => -0.7237690646382793 0.0 0.0 -0.4633855095588306 0.0 0.0  and -0.6652736909178809 0.0 0.0 -1.0812328556372715 0.0 0.0 
+
+[2013.06.17 15:41:40 Generation #5 - Crossover&Mutation chromosome 1]
+Mutation (-0.7237690646382793 0.0 0.0 -0.4633855095588306 0.0 0.0 ) in (-0.7237690646382793 0.8678791827198795 4.117709193122526 0.9264214700201858 0.0 0.0 )
+
+[2013.06.17 15:41:40 Generation #5 - Crossover&Mutation chromosome 1]
+Mutation (-0.6652736909178809 0.0 0.0 -1.0812328556372715 0.0 0.0 ) in (-4.256302949997572 0.0 0.0 -3.5409621555542623 0.0 1.1546954270704033 )
+
+[2013.06.17 15:41:43 Generation #5 - Crossover&Mutation chromosome 1 - Move #8 - Mutant Chromosome Child 2]
+[2013.06.17 15:42:13 Generation #5 - Crossover&Mutation chromosome 1 - Move #68 - Mutant Chromosome Child 2]
+[2013.06.17 15:42:43 Generation #5 - Crossover&Mutation chromosome 2 - Move #41 - Mutant Chromosome Child 2]
+
+[2013.06.17 15:43:05 Generation #5 - Crossover&Mutation chromosome 2]
+Game over for all players!
+    0 - Chromosome Parent 1  - 10 moves - score 0 - 0.0 (-3.1760684933043892 0.0 2.445068775034799 4.359519142219252 -4.166274336843895 0.0 )
+    1 - Mutant Chromosome Child 1 - 15 moves - score 0 - 0.0684931506849315 (-2.275221530704076 2.5273447223296106 -3.57260310402967 1.3078557426657755 -1.2498823010531683 -4.09705910231547 )
+    2 - Mutant Chromosome Child 2 - 19 moves - score 0 - 0.1232876712328767 (-2.7899912236185407 -2.5427060565555237 0.32185618356117485 3.051663399553476 -2.916392035790726 -3.815769657253062 )
+    3 - Chromosome Parent 2  - 83 moves - score 19 - 10.0 (-1.8891442610182274 0.0 -4.632306529877281 0.0 0.0 0.0 )
+2 chromosomes replaced through crossover&mutation.
+
+--Crossover phase--
+
+[2013.06.17 15:43:05 Generation #5 - Crossover chromosome 3]
+Crossover -1.0063126194163328 0.0 3.666048890372627 0.0 0.0 3.8520641969183256  and -1.0063126194163328 0.0 3.666048890372627 0.0 0.0 3.8520641969183256  => -1.0063126194163328 0.0 3.666048890372627 0.0 0.0 3.8520641969183256  and -1.0063126194163328 0.0 3.666048890372627 0.0 0.0 3.8520641969183256 
+
+[2013.06.17 15:43:13 Generation #5 - Crossover chromosome 3 - Move #18 - Chromosome Child 2]
+
+[2013.06.17 15:43:20 Generation #5 - Crossover chromosome 3]
+Game over for all players!
+    0 - Chromosome Parent 2  - 28 moves - score 0 - 9.0 (-1.0063126194163328 0.0 3.666048890372627 0.0 0.0 3.8520641969183256 )
+    1 - Chromosome Parent 2  - 28 moves - score 0 - 9.0 (-1.0063126194163328 0.0 3.666048890372627 0.0 0.0 3.8520641969183256 )
+    2 - Chromosome Child 1 - 30 moves - score 0 - 10.0 (-1.0063126194163328 0.0 3.666048890372627 0.0 0.0 3.8520641969183256 )
+    3 - Chromosome Child 2 - 30 moves - score 0 - 10.0 (-1.0063126194163328 0.0 3.666048890372627 0.0 0.0 3.8520641969183256 )
+
+[2013.06.17 15:43:20 Generation #5 - Crossover chromosome 4]
+Crossover -4.537240704720556 0.0 3.1203778633941965 0.0 0.0 0.0  and -0.5667432783054682 0.0 -1.3896919589631844 0.0 0.0 0.0  => -1.7578925062299946 0.0 -0.03667101225597014 0.0 0.0 0.0  and -3.3460914767960297 0.0 1.7673569166869818 0.0 0.0 0.0 
+
+[2013.06.17 15:43:43 Generation #5 - Crossover chromosome 4 - Move #48 - Chromosome Child 2]
+
+[2013.06.17 15:44:07 Generation #5 - Crossover chromosome 4]
+Game over for all players!
+    0 - Chromosome Parent 1  - 31 moves - score 0 - 0.0 (-4.537240704720556 0.0 3.1203778633941965 0.0 0.0 0.0 )
+    1 - Chromosome Child 2 - 31 moves - score 0 - 0.0 (-3.3460914767960297 0.0 1.7673569166869818 0.0 0.0 0.0 )
+    2 - Chromosome Child 1 - 74 moves - score 16 - 6.671875 (-1.7578925062299946 0.0 -0.03667101225597014 0.0 0.0 0.0 )
+    3 - Chromosome Parent 2  - 95 moves - score 24 - 10.0 (-0.5667432783054682 0.0 -1.3896919589631844 0.0 0.0 0.0 )
+2 chromosomes replaced through crossover.
+
+[2013.06.17 15:44:13 Generation #5 - Move #9 - Robot Genetic 10]
+[2013.06.17 15:44:43 Generation #5 - Move #63 - Robot Genetic 10]
+[2013.06.17 15:45:13 Generation #6 - Mutation chromosome 9 - Move #27 - Mutant Chromosome 9]
+[2013.06.17 15:45:43 Generation #6 - Mutation chromosome 9 - Move #87 - Mutant Chromosome 9]
+
+[2013.06.17 15:45:48 Generation #6 - Mutation chromosome 9]
+Game over for all players!
+    0 - Chromosome 9 - 79 moves - score 18 - 0.0 (-2.55880198309526 -1.9324024569740148 -4.551355740961716 0.0 0.0 0.0 )
+    1 - Mutant Chromosome 9 - 95 moves - score 25 - 10.0 (-1.165236279791566 -1.9324024569740148 -4.551355740961716 0.0 0.0 0.0 )
+1 chromosomes replaced through mutation.
+
+--Crossover & Mutation phase--
+
+[2013.06.17 15:45:48 Generation #6 - Crossover&Mutation chromosome 1]
+Crossover -2.7899912236185407 -2.5427060565555237 0.32185618356117485 3.051663399553476 -2.916392035790726 -3.815769657253062  and -2.55880198309526 0.0 0.0 0.0 0.0 0.0  => -2.628158755252244 -0.7628118169666571 0.09655685506835245 0.9154990198660428 -0.8749176107372177 -1.1447308971759187  and -2.7206344514615566 -1.7798942395888664 0.2252993284928224 2.136164379687433 -2.041474425053508 -2.6710387600771432 
+
+[2013.06.17 15:45:48 Generation #6 - Crossover&Mutation chromosome 1]
+Mutation (-2.628158755252244 -0.7628118169666571 0.09655685506835245 0.9154990198660428 -0.8749176107372177 -1.1447308971759187 ) in (-2.628158755252244 -0.7628118169666571 0.09655685506835245 0.9154990198660428 -0.8749176107372177 -1.1447308971759187 )
+
+[2013.06.17 15:45:48 Generation #6 - Crossover&Mutation chromosome 1]
+Mutation (-2.7206344514615566 -1.7798942395888664 0.2252993284928224 2.136164379687433 -2.041474425053508 -2.6710387600771432 ) in (-2.7206344514615566 -1.7798942395888664 0.2252993284928224 2.136164379687433 -2.041474425053508 -1.0525769013062303 )
+
+[2013.06.17 15:46:13 Generation #6 - Crossover&Mutation chromosome 1 - Move #52 - Mutant Chromosome Child 2]
+
+[2013.06.17 15:46:30 Generation #6 - Crossover&Mutation chromosome 1]
+Game over for all players!
+    0 - Chromosome Parent 1  - 17 moves - score 0 - 0.0 (-2.7899912236185407 -2.5427060565555237 0.32185618356117485 3.051663399553476 -2.916392035790726 -3.815769657253062 )
+    1 - Mutant Chromosome Child 2 - 20 moves - score 0 - 0.04411764705882353 (-2.7206344514615566 -1.7798942395888664 0.2252993284928224 2.136164379687433 -2.041474425053508 -1.0525769013062303 )
+    2 - Mutant Chromosome Child 1 - 25 moves - score 0 - 0.11764705882352941 (-2.628158755252244 -0.7628118169666571 0.09655685506835245 0.9154990198660428 -0.8749176107372177 -1.1447308971759187 )
+    3 - Chromosome Parent 2  - 85 moves - score 20 - 10.0 (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 )
+
+[2013.06.17 15:46:30 Generation #6 - Crossover&Mutation chromosome 2]
+Crossover -1.0063126194163328 0.0 3.666048890372627 0.0 0.0 3.8520641969183256  and -2.55880198309526 0.0 0.0 0.0 0.0 0.0  => -2.0930551739915817 0.0 1.099814667111788 0.0 0.0 1.1556192590754977  and -1.4720594285200108 0.0 2.566234223260839 0.0 0.0 2.696444937842828 
+
+[2013.06.17 15:46:30 Generation #6 - Crossover&Mutation chromosome 2]
+Mutation (-2.0930551739915817 0.0 1.099814667111788 0.0 0.0 1.1556192590754977 ) in (-2.0930551739915817 0.08260614604486527 2.2083336392352066 0.0 2.579771008116417 1.1556192590754977 )
+
+[2013.06.17 15:46:30 Generation #6 - Crossover&Mutation chromosome 2]
+Mutation (-1.4720594285200108 0.0 2.566234223260839 0.0 0.0 2.696444937842828 ) in (-1.4720594285200108 0.0 2.566234223260839 0.0 3.5048817683729325 -4.163364677408775 )
+
+[2013.06.17 15:46:43 Generation #6 - Crossover&Mutation chromosome 2 - Move #27 - Mutant Chromosome Child 2]
+
+[2013.06.17 15:47:12 Generation #6 - Crossover&Mutation chromosome 2]
+Game over for all players!
+    0 - Mutant Chromosome Child 2 - 13 moves - score 0 - 0.0 (-1.4720594285200108 0.0 2.566234223260839 0.0 3.5048817683729325 -4.163364677408775 )
+    1 - Chromosome Parent 1  - 23 moves - score 0 - 0.14084507042253522 (-1.0063126194163328 0.0 3.666048890372627 0.0 0.0 3.8520641969183256 )
+    2 - Mutant Chromosome Child 1 - 32 moves - score 0 - 0.2676056338028169 (-2.0930551739915817 0.08260614604486527 2.2083336392352066 0.0 2.579771008116417 1.1556192590754977 )
+    3 - Chromosome Parent 2  - 84 moves - score 19 - 10.0 (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 )
+2 chromosomes replaced through crossover&mutation.
+
+--Crossover phase--
+
+[2013.06.17 15:47:12 Generation #6 - Crossover chromosome 3]
+Crossover -0.5667432783054682 0.0 -1.3896919589631844 0.0 0.0 0.0  and -2.55880198309526 -1.9324024569740148 -4.551355740961716 0.0 0.0 0.0  => -1.9611843716583224 -1.3526817198818102 -3.6028566063621565 0.0 0.0 0.0  and -1.1643608897424058 -0.5797207370922044 -2.3381910935627435 0.0 0.0 0.0 
+
+[2013.06.17 15:47:13 Generation #6 - Crossover chromosome 3 - Move #3 - Chromosome Child 2]
+[2013.06.17 15:47:43 Generation #6 - Crossover chromosome 3 - Move #63 - Chromosome Child 2]
+[2013.06.17 15:48:13 Generation #6 - Crossover chromosome 3 - Move #123 - Chromosome Child 2]
+
+[2013.06.17 15:48:14 Generation #6 - Crossover chromosome 3]
+Game over for all players!
+    0 - Chromosome Child 1 - 66 moves - score 15 - 0.0 (-1.9611843716583224 -1.3526817198818102 -3.6028566063621565 0.0 0.0 0.0 )
+    1 - Chromosome Child 2 - 69 moves - score 15 - 0.05172413793103448 (-1.1643608897424058 -0.5797207370922044 -2.3381910935627435 0.0 0.0 0.0 )
+    2 - Chromosome Parent 1  - 72 moves - score 19 - 1.8177339901477831 (-0.5667432783054682 0.0 -1.3896919589631844 0.0 0.0 0.0 )
+    3 - Chromosome Parent 2  - 124 moves - score 36 - 10.0 (-2.55880198309526 -1.9324024569740148 -4.551355740961716 0.0 0.0 0.0 )
+
+[2013.06.17 15:48:14 Generation #6 - Crossover chromosome 4]
+Crossover -0.5667432783054682 0.0 -1.3896919589631844 0.0 0.0 0.0  and -0.7676405949285781 0.0 0.0 0.0 0.0 0.0  => -0.7073713999416451 0.0 -0.4169075876889553 0.0 0.0 0.0  and -0.6270124732924012 0.0 -0.972784371274229 0.0 0.0 0.0 
+
+[2013.06.17 15:48:43 Generation #6 - Crossover chromosome 4 - Move #59 - Chromosome Child 2]
+[2013.06.17 15:49:14 Generation #6 - Move #5 - Robot Genetic 8]
+[2013.06.17 15:49:44 Generation #6 - Move #51 - Robot Genetic 10]
+[2013.06.17 15:50:14 Generation #6 - Move #111 - Robot Genetic 10]
+[2013.06.17 15:50:44 Generation #6 - Move #171 - Robot Genetic 10]
+
+[2013.06.17 15:50:47 Generation #6]
+Game over for all players!
+    0 - Robot Genetic 2 - 21 moves - score 0 - 0.0 (-2.628158755252244 -0.7628118169666571 0.09655685506835245 0.9154990198660428 -0.8749176107372177 -1.1447308971759187 )
+    1 - Robot Genetic 3 - 39 moves - score 0 - 0.11464968152866242 (-2.0930551739915817 0.08260614604486527 2.2083336392352066 0.0 2.579771008116417 1.1556192590754977 )
+    2 - Robot Genetic 6 - 44 moves - score 6 - 1.0938652363392558 (-1.8891442610182274 0.0 -4.632306529877281 0.0 0.0 0.0 )
+    3 - Robot Genetic - 57 moves - score 13 - 2.2819309420046934 (-1.165236279791566 -1.9324024569740148 -4.551355740961716 0.0 0.0 0.0 )
+    4 - Robot Genetic 10 - 61 moves - score 13 - 2.307408649011063 (-2.55880198309526 -1.9324024569740148 -4.551355740961716 0.0 0.0 0.0 )
+    5 - Robot Genetic 4 - 73 moves - score 16 - 2.8575259805564865 (-0.5667432783054682 0.0 -1.3896919589631844 0.0 0.0 0.0 )
+    6 - Robot Genetic 8 - 84 moves - score 18 - 3.2433791485082133 (-0.7676405949285781 0.0 0.0 0.0 0.0 0.0 )
+    7 - Robot Genetic 9 - 84 moves - score 18 - 3.2433791485082133 (-2.55880198309526 0.0 0.0 0.0 0.0 0.0 )
+    8 - Robot Genetic 5 - 165 moves - score 52 - 9.127723768018773 (-0.7073713999416451 0.0 -0.4169075876889553 0.0 0.0 0.0 )
+    9 - Robot Genetic 7 - 178 moves - score 57 - 10.0 (-1.7578925062299946 0.0 -0.03667101225597014 0.0 0.0 0.0 )
+
+######################################################
+Generation 6 STOP
+######################################################
+
+######################################################
+Generation 7 START
+######################################################
+
+[2013.06.17 15:50:47 Generation #7]
+4 chromosomes replaced through mutation so far
+10 chromosomes replaced through crossover&mutation so far
+7 chromosomes replaced through crossover so far
+
+--Mutation phase--
+
+[2013.06.17 15:50:47 Generation #7 - Mutation chromosome 9]
+Mutation (-1.7578925062299946 0.0 -0.03667101225597014 0.0 0.0 0.0 ) in (-1.7578925062299946 0.0 -1.3752136491864575 0.0 0.0 -1.8061595830357504 )
+
+[2013.06.17 15:51:14 Generation #7 - Mutation chromosome 9 - Move #53 - Mutant Chromosome 9]
+
+[2013.06.17 15:51:31 Generation #7 - Mutation chromosome 9]
+Game over for all players!
+    0 - Mutant Chromosome 9 - 38 moves - score 0 - 0.0 (-1.7578925062299946 0.0 -1.3752136491864575 0.0 0.0 -1.8061595830357504 )
+    1 - Chromosome 9 - 87 moves - score 21 - 10.0 (-1.7578925062299946 0.0 -0.03667101225597014 0.0 0.0 0.0 )
+0 chromosomes replaced through mutation.
+
+--Crossover & Mutation phase--
+
+[2013.06.17 15:51:31 Generation #7 - Crossover&Mutation chromosome 1]
+Crossover -2.0930551739915817 0.08260614604486527 2.2083336392352066 0.0 2.579771008116417 1.1556192590754977  and -0.7676405949285781 0.0 0.0 0.0 0.0 0.0  => -1.1652649686474792 0.02478184381345958 0.662500091770562 0.0 0.773931302434925 0.3466857777226493  and -1.6954308002726806 0.05782430223140569 1.5458335474646445 0.0 1.8058397056814917 0.8089334813528484 
+
+[2013.06.17 15:51:31 Generation #7 - Crossover&Mutation chromosome 1]
+Mutation (-1.1652649686474792 0.02478184381345958 0.662500091770562 0.0 0.773931302434925 0.3466857777226493 ) in (0.021492348766557257 0.02478184381345958 0.662500091770562 0.0 0.773931302434925 0.3466857777226493 )
+
+[2013.06.17 15:51:31 Generation #7 - Crossover&Mutation chromosome 1]
+Mutation (-1.6954308002726806 0.05782430223140569 1.5458335474646445 0.0 1.8058397056814917 0.8089334813528484 ) in (0.9076768241410536 4.422453776495992 1.5458335474646445 -2.981728690570329 1.8058397056814917 2.222038564569786 )
+
+[2013.06.17 15:51:44 Generation #7 - Crossover&Mutation chromosome 1 - Move #26 - Mutant Chromosome Child 2]
+
+[2013.06.17 15:52:07 Generation #7 - Crossover&Mutation chromosome 1]
+Game over for all players!
+    0 - Mutant Chromosome Child 2 - 13 moves - score 0 - 0.0 (0.9076768241410536 4.422453776495992 1.5458335474646445 -2.981728690570329 1.8058397056814917 2.222038564569786 )
+    1 - Mutant Chromosome Child 1 - 18 moves - score 0 - 0.08333333333333333 (0.021492348766557257 0.02478184381345958 0.662500091770562 0.0 0.773931302434925 0.3466857777226493 )
+    2 - Chromosome Parent 1  - 43 moves - score 0 - 0.5 (-2.0930551739915817 0.08260614604486527 2.2083336392352066 0.0 2.579771008116417 1.1556192590754977 )
+    3 - Chromosome Parent 2  - 73 moves - score 14 - 10.0 (-0.7676405949285781 0.0 0.0 0.0 0.0 0.0 )
+
+[2013.06.17 15:52:07 Generation #7 - Crossover&Mutation chromosome 2]
+Crossover -1.8891442610182274 0.0 -4.632306529877281 0.0 0.0 0.0  and -1.7578925062299946 0.0 -0.03667101225597014 0.0 0.0 0.0  => -1.7972680326664643 0.0 -1.4153616675423635 0.0 0.0 0.0  and -1.8497687345817575 0.0 -3.253615874590888 0.0 0.0 0.0 
+
+[2013.06.17 15:52:07 Generation #7 - Crossover&Mutation chromosome 2]
+Mutation (-1.7972680326664643 0.0 -1.4153616675423635 0.0 0.0 0.0 ) in (-1.8004141174681507 3.427597520497791 -1.4153616675423635 -1.1863669660056066 0.0 -1.3182208869042222 )
+
+[2013.06.17 15:52:07 Generation #7 - Crossover&Mutation chromosome 2]
+Mutation (-1.8497687345817575 0.0 -3.253615874590888 0.0 0.0 0.0 ) in (-0.22056632191917558 0.0 -0.25289964451211766 0.0 0.0 0.0 )
+
+[2013.06.17 15:52:14 Generation #7 - Crossover&Mutation chromosome 2 - Move #13 - Mutant Chromosome Child 2]
+
+[2013.06.17 15:52:43 Generation #7 - Crossover&Mutation chromosome 2]
+Game over for all players!
+    0 - Mutant Chromosome Child 1 - 18 moves - score 0 - 0.0 (-1.8004141174681507 3.427597520497791 -1.4153616675423635 -1.1863669660056066 0.0 -1.3182208869042222 )
+    1 - Mutant Chromosome Child 2 - 40 moves - score 2 - 1.6074074074074074 (-0.22056632191917558 0.0 -0.25289964451211766 0.0 0.0 0.0 )
+    2 - Chromosome Parent 1  - 51 moves - score 9 - 6.011111111111111 (-1.8891442610182274 0.0 -4.632306529877281 0.0 0.0 0.0 )
+    3 - Chromosome Parent 2  - 72 moves - score 15 - 10.0 (-1.7578925062299946 0.0 -0.03667101225597014 0.0 0.0 0.0 )
+0 chromosomes replaced through crossover&mutation.
+
+--Crossover phase--
+
+[2013.06.17 15:52:43 Generation #7 - Crossover chromosome 3]
+Crossover -1.165236279791566 -1.9324024569740148 -4.551355740961716 0.0 0.0 0.0  and -0.7073713999416451 0.0 -0.4169075876889553 0.0 0.0 0.0  => -0.8447308638966213 -0.5797207370922044 -1.6572420336707834 0.0 0.0 0.0  and -1.0278768158365899 -1.3526817198818102 -3.311021294979888 0.0 0.0 0.0 
+
+[2013.06.17 15:52:44 Generation #7 - Crossover chromosome 3 - Move #1 - Chromosome Parent 1 ]
+[2013.06.17 15:53:14 Generation #7 - Crossover chromosome 3 - Move #61 - Chromosome Child 2]
+[2013.06.17 15:53:44 Generation #7 - Crossover chromosome 4 - Move #42 - Chromosome Child 2]
+[2013.06.17 15:54:14 Generation #7 - Crossover chromosome 4 - Move #102 - Chromosome Child 2]
+
+[2013.06.17 15:54:14 Generation #7 - Crossover chromosome 4]
+Game over for all players!
+    0 - Chromosome Parent 1  - 50 moves - score 6 - 0.0 (-2.55880198309526 -1.9324024569740148 -4.551355740961716 0.0 0.0 0.0 )
+    1 - Chromosome Child 2 - 50 moves - score 6 - 0.0 (-2.0033728081491753 -1.3526817198818102 -3.311021294979888 0.0 0.0 0.0 )
+    2 - Chromosome Child 1 - 58 moves - score 10 - 1.953846153846154 (-1.2628005748877296 -0.5797207370922044 -1.6572420336707834 0.0 0.0 0.0 )
+    3 - Chromosome Parent 2  - 102 moves - score 26 - 10.0 (-0.7073713999416451 0.0 -0.4169075876889553 0.0 0.0 0.0 )
+2 chromosomes replaced through crossover.
+
+[2013.06.17 15:54:44 Generation #7 - Move #49 - Robot Genetic 8]
+[2013.06.17 15:55:14 Generation #7 - Move #109 - Robot Genetic 10]
+[2013.06.17 15:55:44 Generation #7 - Move #169 - Robot Genetic 10]
+[2013.06.17 15:56:14 Generation #7 - Move #229 - Robot Genetic 10]
+[2013.06.17 15:56:44 Generation #7 - Move #289 - Robot Genetic 10]
+[2013.06.17 15:57:14 Generation #7 - Move #349 - Robot Genetic 10]
+[2013.06.17 15:57:44 Generation #7 - Move #409 - Robot Genetic 10]
+[2013.06.17 15:58:14 Generation #7 - Move #468 - Robot Genetic 10]
+[2013.06.17 15:58:44 Generation #7 - Move #528 - Robot Genetic 10]
+[2013.06.17 15:59:14 Generation #7 - Move #588 - Robot Genetic 10]
+[2013.06.17 15:59:44 Generation #7 - Move #648 - Robot Genetic 10]
+[2013.06.17 16:00:14 Generation #7 - Move #708 - Robot Genetic 10]
+[2013.06.17 16:00:44 Generation #7 - Move #768 - Robot Genetic 10]
+[2013.06.17 16:01:14 Generation #7 - Move #828 - Robot Genetic 10]
+[2013.06.17 16:01:44 Generation #7 - Move #888 - Robot Genetic 10]
+[2013.06.17 16:02:14 Generation #7 - Move #948 - Robot Genetic 10]
+[2013.06.17 16:02:44 Generation #7 - Move #1008 - Robot Genetic 10]
+[2013.06.17 16:03:14 Generation #7 - Move #1068 - Robot Genetic 10]
+[2013.06.17 16:03:44 Generation #7 - Move #1128 - Robot Genetic 10]

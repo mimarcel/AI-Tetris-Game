@@ -6,6 +6,8 @@ This repository is split in two main parts:
 
 AI Tetris game runs in several environments: Processing, as an applet, as a stand-alone application in Linux, Mac OS X and Windows and finally, using Processing.js, it does also run in Javascript.
 
+![AI Tetris Demo](./AI_Tetris.jpg)
+
 The training program runs in Java.
 
 ## Files Structure
